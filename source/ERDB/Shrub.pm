@@ -592,7 +592,7 @@ sub ParseFunction {
 	# Separate out the comment (if any).
 	my $statement = $function;
 	my $comment = "";
-	if ($function =~ /(.+?)\s*[#!](.+)/) {
+	if ($function && $function =~ /(.+?)\s*[#!](.+)/) {
 		($statement, $comment) = ($1, $2);		
 	}
 	# The roles and the separator will go in here.

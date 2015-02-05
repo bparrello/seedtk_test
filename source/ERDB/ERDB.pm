@@ -4905,10 +4905,14 @@ sub InsertObject {
     } else {
         # Build the INSERT statement.
         my $command = "INSERT";
-        if ($options->{ignore} || $options->{dup} eq 'ignore') {
-        	$command = "INSERT IGNORE";
-        } elsif ($options->{dup} eq 'replace') {
-        	$command = "REPLACE";
+        if ($options->{ignore}) {
+        	$command = "INSERT IGNORE";       	
+        } elsif ($options->{dup}) {
+        	if ($options->{dup} eq 'ignore') {
+        		$command = "INSERT IGNORE";
+        	} elsif ($options->{dup} eq 'replace') {
+        		$command = "REPLACE";
+        	}
         }
         my $statement = "$command INTO $q$newObjectType$q (" . join (', ', @fieldNameList) .
             ") VALUES (";

@@ -227,7 +227,7 @@ sub ConnectPegFunctions {
 	# Get the statistics object.
 	my $stats = $loader->stats;
 	# Open the genome's protein FASTA.
-	print "Processing $genome.\n";
+	print "Processing $genome peg functions.\n";
 	my $fh = $loader->OpenFasta("$genomeDir/peg-trans", 'protein');
 	# Loop through the proteins.
 	while (my $protDatum = $loader->GetLine($fh, 'protein')) {
@@ -250,8 +250,8 @@ sub ConnectPegFunctions {
 			}
 			# If we are adding translation links, add them here.
 			if ($translateLinks) {
-				$loader->InsertObject('Feature2Protein', 'from-link' => $pegId,
-						'to-link' => $protID);
+				$loader->InsertObject('Protein2Feature', 'to-link' => $pegId,
+						'from-link' => $protID);
 				$stats->Add(featureLinkInserted => 1);
 			}
 		}
@@ -326,7 +326,7 @@ sub ReadFeatures {
 		my $ordinal = 0;
 		for my $loc (@locs) {
 			$loader->InsertObject('Feature2Contig', 'from-link' => $fid, 'to-link' => ($genome . ":" . $loc->Contig),
-					begin => $loc->Left, dir => $loc->Dir, len => $loc->Len, ordinal => ++$ordinal);
+					begin => $loc->Left, dir => $loc->Dir, len => $loc->Length, ordinal => ++$ordinal);
 			$stats->Add(featureSegment => 1);
 		}
 	}

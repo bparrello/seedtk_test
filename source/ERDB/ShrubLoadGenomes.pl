@@ -71,7 +71,7 @@ Load all of the genomes in the genome directory. Mutually exclusive with C<genom
 	use MD5Computer;
 	
 	# This is the list of tables we are loading.
-	use constant LOADTABLES => qw(Genome Genome2Contig Contig Genome2Feature Feature Feature2Contig Feature2Function);
+	use constant LOADTABLES => qw(Genome Genome2Contig Contig Genome2Feature Feature Feature2Contig Feature2Function Protein2Feature);
 	
 	# Start timing.
 	my $startTime = time;
@@ -84,7 +84,7 @@ Load all of the genomes in the genome directory. Mutually exclusive with C<genom
 			["genomes=s", "name of a file containing a list of the genomes to load"],
 			["missing|m", "only load genomes not already in the database"],
 			["override|o", "override existing protein function assignments"],
-			["clear|c", "clear the genome tables before loading", { implies => 'missing' }],
+			["clear|c", "clear the genome tables before loading"],
 			["all|a", "process all genomes in the genome directory"],
 		);
 	# We are connected. Create the loader utility object.
@@ -171,8 +171,6 @@ Load all of the genomes in the genome directory. Mutually exclusive with C<genom
  		if ($metaHash) {
 	 		# Get the input repository directory.
 	 		my $genomeLoc = $genomeHash->{$genome};
-	 		# Read the metadata.
-	 		my $metaHash = $loader->ReadMetaData("$genomeLoc/genome-info", required => [qw(type name)]);
 	 		# Parse the genome name.
 	 		my ($genus, $species) = split /\s+/, $metaHash->{name};
 	 		# Form the repository directory for the DNA.
@@ -197,9 +195,9 @@ Load all of the genomes in the genome directory. Mutually exclusive with C<genom
 	 		# genome's DNA computed so we can insert the genome record first.
 	 		my @contigData;
 	 		# Open the contig file.
-	 		my $fh = $loader->OpenFasta("$absPath/$genome.fa");
+	 		my $fh = $loader->OpenFasta("$absPath/$genome.fa", 'contig');
 	 		# Loop through the contigs.
-	 		while (my $contigInfo = $loader->GetLine($fh)) {
+	 		while (my $contigInfo = $loader->GetLine($fh, 'contig')) {
 	 			my ($contigID, undef, $seq) = @$contigInfo;
 	 			$stats->Add(contigs => 1);
 	 			# Compute the contig MD5.
@@ -214,12 +212,13 @@ Load all of the genomes in the genome directory. Mutually exclusive with C<genom
 	 			# Save the contig information.
 	 			push @contigData, { id => "$genome:$contigID", length => $contigLen, 'md5-identifier' => $contigMD5 };
 	 		}
+	 		# Finish the MD5 computations.
+	 		my $genomeMD5 = $md5Thing->CloseGenome();
 	 		# Now we can create the genome record.
 	 		print "Storing $genome in database.\n";
 	 		$loader->InsertObject('Genome', id => $genome, contigs => $contigCount,
 	 				core => $metaHash->{type}, 'dna-size' => $dnaCount, 'gc-content' => ($gcCount * 100 / $dnaCount),
-	 				'md5-identifier' => $md5Thing->genomeMD5(), name => $metaHash->{name},
-	 				'contig-file' => "$relPath/$genome.fa");
+	 				'md5-identifier' => $genomeMD5, name => $metaHash->{name}, 'contig-file' => "$relPath/$genome.fa");
 	 		$stats->Add(genomeInserted => 1);
 	 		# Connect the contigs to it.
 	 		for my $contigDatum (@contigData) {
@@ -249,7 +248,6 @@ Load all of the genomes in the genome directory. Mutually exclusive with C<genom
 	 		}
 	 		print "Processing protein features.\n";
 	 		my $pegHash = $funcLoader->ReadFeatures($genome, "$genomeLoc/peg-info");
-	 		print "Connecting to functions.\n";
 	 		$funcLoader->ConnectPegFunctions($genome, $genomeLoc, $pegHash, priv => $priv);
  		}
  	}
