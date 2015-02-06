@@ -71,7 +71,7 @@ Load all of the genomes in the genome directory. Mutually exclusive with C<genom
 	use File::Copy ();
 	
 	# This is the list of tables we are loading.
-	use constant LOADTABLES => qw(Genome Genome2Contig Contig Genome2Feature Feature Feature2Contig Feature2Function Protein2Feature);
+	use constant LOADTABLES => qw(Genome Genome2Contig Contig Genome2Feature Feature Feature2Contig Feature2Function Protein2Feature Protein);
 	
 	# Start timing.
 	my $startTime = time;

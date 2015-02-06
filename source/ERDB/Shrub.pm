@@ -136,7 +136,7 @@ sub new {
     my $userData = $options{userData} || $FIG_Config::userData || "seed/";
     my $dbhost = $options{dbhost} || $FIG_Config::dbhost || "seed-db-write.mcs.anl.gov";
     my $repository = $options{repository} || "$dirBase/DnaRepo";
-    my $port = $options{port} || 3306;
+    my $port = $options{port} || $FIG_Config::dbport || 3306;
     my $dbms = $options{dbms} || 'mysql';
     # Insure that if the user specified a DBD, it overrides the internal one.
     if ($options{DBD} && ! defined $options{externalDBD}) {
