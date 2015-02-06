@@ -22,8 +22,6 @@
 package BasicLocation;
 
     use strict;
-   require BBasicLocation;
-   require FBasicLocation;
 
 =head1 Basic Location Object
 
@@ -200,6 +198,8 @@ Index of this basic location in the parent full location.
 sub new {
     # Get the parameters.
     my ($class, @p) = @_;
+    require BBasicLocation;
+    require FBasicLocation;
     # Declare the data variables.
     my ($contigID, $beg, $dir, $len, $end, $parent, $idx, $augments, $augmentString);
     # Determine the signature type.

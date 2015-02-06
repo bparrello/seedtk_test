@@ -66,9 +66,9 @@ Load all of the genomes in the genome directory. Mutually exclusive with C<genom
 	use Shrub;
 	use ShrubLoader;
 	use ShrubFunctionLoader;
+	use ShrubGenomeLoader;
 	use File::Path ();
 	use File::Copy ();
-	use MD5Computer;
 	
 	# This is the list of tables we are loading.
 	use constant LOADTABLES => qw(Genome Genome2Contig Contig Genome2Feature Feature Feature2Contig Feature2Function Protein2Feature);
@@ -89,6 +89,8 @@ Load all of the genomes in the genome directory. Mutually exclusive with C<genom
 		);
 	# We are connected. Create the loader utility object.
 	my $loader = ShrubLoader->new($shrub);
+	# Create the genome loader utility object.
+	my $genomeLoader = ShrubGenomeLoader->new($loader);
 	# Get the statistics object.
 	my $stats = $loader->stats;
 	# Get the positional parameters.
@@ -161,7 +163,7 @@ Load all of the genomes in the genome directory. Mutually exclusive with C<genom
 	# The next step is to resolve collisions. The following method will check for duplicate genomes and
 	# delete existing genomes that conflict with the incoming ones. At the end, $genomeMeta will be a
 	# hash mapping the ID of each genome we need to process to it metadata.
-	my $genomeMeta = $loader->CurateNewGenomes($genomeHash, $opt->missing, $opt->clear);
+	my $genomeMeta = $genomeLoader->CurateNewGenomes($genomeHash, $opt->missing, $opt->clear);
 	# Get the DNA repository directory.
 	my $dnaRepo = $shrub->DNArepo;
 	# Loop through the incoming genomes.
@@ -186,43 +188,19 @@ Load all of the genomes in the genome directory. Mutually exclusive with C<genom
 	 		# Now we read the contig file and analyze the DNA for gc-content, number
 	 		# of bases, and the list of contigs.
 	 		print "Analyzing contigs.\n";
-	 		my $gcCount = 0;
-	 		my $dnaCount = 0;
-	 		my $contigCount = 0;
-	 		my $md5Thing = MD5Computer->new();
-	 		# This list will contain a hash of the fields in each contig record. We
-	 		# will insert the contigs after we have all the information about the
-	 		# genome's DNA computed so we can insert the genome record first.
-	 		my @contigData;
-	 		# Open the contig file.
-	 		my $fh = $loader->OpenFasta("$absPath/$genome.fa", 'contig');
-	 		# Loop through the contigs.
-	 		while (my $contigInfo = $loader->GetLine($fh, 'contig')) {
-	 			my ($contigID, undef, $seq) = @$contigInfo;
-	 			$stats->Add(contigs => 1);
-	 			# Compute the contig MD5.
-	 			my $contigMD5 = $md5Thing->ProcessContig($contigID, [$seq]);
-	 			# Get its length.
-	 			my $contigLen = length $seq;
-	 			$stats->Add(dnaBases => $contigLen);
-	 			# Accumulate the genome statistics.
-	 			$gcCount += ($seq =~ tr/GCgc//);
-	 			$dnaCount += $contigLen;
-	 			$contigCount++;
-	 			# Save the contig information.
-	 			push @contigData, { id => "$genome:$contigID", length => $contigLen, 'md5-identifier' => $contigMD5 };
-	 		}
-	 		# Finish the MD5 computations.
-	 		my $genomeMD5 = $md5Thing->CloseGenome();
+	 		my ($contigList, $genomeHash) = $genomeLoader->AnalyzeContigFasta("$absPath/$genome.fa");
 	 		# Now we can create the genome record.
 	 		print "Storing $genome in database.\n";
-	 		$loader->InsertObject('Genome', id => $genome, contigs => $contigCount,
-	 				core => $metaHash->{type}, 'dna-size' => $dnaCount, 'gc-content' => ($gcCount * 100 / $dnaCount),
-	 				'md5-identifier' => $genomeMD5, name => $metaHash->{name}, 'contig-file' => "$relPath/$genome.fa");
+	 		$loader->InsertObject('Genome', id => $genome, %$genomeHash, 
+	 				core => $metaHash->{type}, name => $metaHash->{name}, 'contig-file' => "$relPath/$genome.fa");
 	 		$stats->Add(genomeInserted => 1);
 	 		# Connect the contigs to it.
-	 		for my $contigDatum (@contigData) {
+	 		for my $contigDatum (@$contigList) {
+	 			# Fix the contig ID.
+	 			$contigDatum->{id} = "$genome:$contigDatum->{id}";
+	 			# Connect the genome to the contig.
 	 			$loader->InsertObject('Genome2Contig', 'from-link' => $genome, 'to-link' => $contigDatum->{id});
+	 			# Create the contig.
 	 			$loader->InsertObject('Contig', %$contigDatum);
 	 			$stats->Add(contigInserted => 1);
 	 		}

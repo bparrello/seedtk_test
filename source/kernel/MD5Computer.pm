@@ -36,10 +36,46 @@ genome descriptor contains the MD5 identifiers of a genome's contigs, and can
 be used to compute the genome's identifier as well as the identifiers of its
 genes.
 
+=head2 Usage
+
+To create a descriptor from a contig FASTA file in a single command, use
+
+	my $descriptor = MD5Computer->new_from_fasta($fileName);
+
+You may then interrogate the descriptor for the genome MD5
+
+	my $gMD5 = $descriptor->genomeMD5;
+
+Get a list of the contig IDs.
+
+	my @cIDs = $descriptor->contigs;
+
+and ask for the contig MD5s by ID.
+
+	my @cMD5s = map { $descriptor->contigMD5($_) } @cIDs;
+
+If you need to look at the contig data as it comes through, you can build the structure
+a chunk at a time.
+
+	my $descriptor = MD5Computer->new();
+	...
+	for (... each contig ...) {
+		$descriptor->StartContig($id);
+		for (... each DNA chunk ...) {
+			$descriptor->AddChunk($dna);
+			...
+		}
+		my $contigMD5 = $descriptor->CloseContig();
+		...
+	}
+	my $genomeMD5 = $descriptor->CloseGenome();
+	...
+
 =cut
 
 use strict;
 use Digest::MD5;
+use Carp;
 
 =head2 Constructors
 
@@ -57,7 +93,7 @@ sub new {
 	my ($class) = @_;
 
 	# Create the descriptor.
-	my $retVal = { contigs => {} };
+	my $retVal = { contigs => {}, contigID => undef, context => Digest::MD5->new() };
 
 	# Bless and return it.
 	bless $retVal, $class;
@@ -108,11 +144,7 @@ sub new_from_fasta {
 		open $ih, "<$fileName" || die "Cannot open contig FASTA: $!\n";
 	}
 
-	# We'll accumulate DNA chunks in here.
-	my @dnaChunks;
-
-	# This will hold the contig ID.
-	my $contigID;
+	# Loop through the file.
 	while ( !eof $ih ) {
 
 		# Read the input line and chomp off the new-line code.
@@ -121,28 +153,27 @@ sub new_from_fasta {
 
 		# Is this a header line?
 		if ( $line =~ /^>(\S+)/ ) {
+			my $newContigID = $1;
 
 			# Yes. Output the previous contig (if any).
-			if ($contigID) {
-				$retVal->ProcessContig( $contigID, \@dnaChunks );
+			if ($retVal->{contigID}) {
+				$retVal->CloseContig();
 			}
 
 			# Save the new contig ID.
-			$contigID = $1;
+			$retVal->StartContig($newContigID);
 
-			# Clear the DNA chunk holder.
-			@dnaChunks = ();
 		}
 		else {
 
 			# This is a data line, so store it as a DNA chunk.
-			push @dnaChunks, $line;
+			$retVal->AddChunk($line);
 		}
 	}
 
-	# Output the residual contig.
-	if ($contigID) {
-		$retVal->ProcessContig( $contigID, \@dnaChunks );
+	# Close the residual contig.
+	if ($retVal->{contigID}) {
+		$retVal->CloseContig();
 	}
 
 	# Close the genome.
@@ -153,6 +184,90 @@ sub new_from_fasta {
 }
 
 =head2 Genome Descriptor Methods
+
+=head3 StartContig
+
+	$descriptor->StartContig($contigID);
+
+Start processing a contig. The DNA of the contig should be passed in via L</AddChunk>
+calls.
+
+=over 4
+
+=item contigID
+
+ID of the contig to start processing.
+
+=back
+
+=cut
+
+sub StartContig {
+	# Get the parameters.
+	my ($self, $contigID) = @_;
+	# Close any contig currently in progress.
+	if ($self->{contigID}) {
+		$self->CloseContig();
+	}
+	# Save the contig ID.
+	$self->{contigID} = $contigID;
+}
+
+=head3 AddChunk
+
+	$descriptor->AddChunk($dna);
+
+Add a chunk of DNA to the current contig.
+
+=over 4
+
+=item dna
+
+DNA sequence to add to the current contig.
+
+=back
+
+=cut
+
+sub AddChunk {
+	# Get the parameters.
+	my ($self, $dna) = @_;
+	# Insure we are in a contig.
+	if (! $self->{contigID}) {
+		confess "AddChunk called before StartContig in MD5Computer.";
+	} else {
+		# Add the DNA to the current MD5 context. Note we convert it to
+		# upper case.
+		$self->{context}->add(uc $dna);
+	}	
+}
+
+=head3 CloseContig
+
+	my $contigMD5 = $descriptor->CloseContig();
+
+Compute the MD5 of the current contig and return it. The contig context is cleared so
+that a new contig can be processed.
+
+=cut
+
+sub CloseContig {
+	# Get the parameters.
+	my ($self) = @_;
+	# Get the current contig ID.
+	my $contigID = $self->{contigID};
+	if (! $contigID) {
+		confess "CloseContig called before StartContig in MD5Computer."
+	}
+	# Compute the MD5. This resets us for the next contig.
+	my $retVal = $self->{context}->hexdigest;
+	# Store it in the contig hash.
+	$self->{contigs}{$contigID} = $retVal;
+	# Clear the context so we know no contig is in progress.
+	$self->{contigID} = undef;
+	# Return the MD5 computed.
+	return $retVal;	
+}
 
 =head3 ProcessContig
 
@@ -192,11 +307,13 @@ sub ProcessContig {
 		$dnaChunks = [$dnaChunks];
 	}
 
+	# Start the contig.
+	$self->StartContig($contigID);
 	# Merge the DNA chunks and take the MD5.
-	my $retVal = Digest::MD5::md5_hex( map { uc $_ } @$dnaChunks );
-
-	# Store it in the contig hash.
-	$self->StoreContig( $contigID, $retVal );
+	for my $chunk (@$dnaChunks) {
+		$self->AddChunk($chunk);
+	}
+	my $retVal = CloseContig();
 
 	# Return it to the caller.
 	return $retVal;
@@ -244,6 +361,11 @@ sub CloseGenome {
 
 	# Get the parameters.
 	my ($self) = @_;
+	
+	# If there is a contig in progress, close it automatically.
+	if ($self->{contigID}) {
+		$self->CloseContig();
+	}
 
 	# Compute the MD5 for the genome.
 	my $contigString = join( ",", sort values %{ $self->{contigs} } );

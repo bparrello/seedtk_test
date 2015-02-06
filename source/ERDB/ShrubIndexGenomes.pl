@@ -22,6 +22,7 @@
     use SeedUtils;
     use ShrubLoader;
     use Shrub;
+    use MD5Computer;
 
 =head1 Shrub Genome Source Repository Index Creator
 
@@ -31,14 +32,25 @@ This script reads the hierarchy of a genome repository and creates its index fil
 
 This script loads the DBD but does not connect to the database.
 
-The command-line options are as specified in L<Shrub/new_for_script>. The positional
-parameter is the name of the genome directory.
+The command-line options are as specified in L<Shrub/new_for_script> plus the
+following.
+
+=over 4
+
+=item fixMD5
+
+If specified, the script will recompute each genome's MD5 from its contigs file.
+
+=back
+
+The positional parameter is the name of the genome directory.
 
 =cut
 
 	$| = 1; # Prevent buffering on STDOUT.
 	# Connect to the database.
-	my ($shrub, $opt) = Shrub->new_for_script('%c %o genomeDIrectory', { offline => 1 });
+	my ($shrub, $opt) = Shrub->new_for_script('%c %o genomeDIrectory', { offline => 1 },
+			["fixMD5|f", "recompute MD5 identifiers in the genome-info files"]);
     # Create the loader object.
     my $loader = ShrubLoader->new($shrub);
     my $stats = $loader->stats;
@@ -63,10 +75,22 @@ parameter is the name of the genome directory.
     	# Read its metadata.
     	my $metaHash = $loader->ReadMetaData("$genomeLoc/genome-info", required => 'name');
     	# Relocate the directory so that it is relative to the repository.
-    	$genomeLoc = substr($genomeLoc, $repoNameLen + 1);
+    	my $genomeRelLoc = substr($genomeLoc, $repoNameLen + 1);
     	# Write the ID, name, and directory to the output file.
-    	print $oh join("\t", $genome, $metaHash->{name}, $genomeLoc) . "\n";
+    	print $oh join("\t", $genome, $metaHash->{name}, $genomeRelLoc) . "\n";
     	$stats->Add(genomeOut => 1);
+    	# Are we fixing MD5s?
+    	if ($opt->fixmd5) {
+    		# Yes. Get the MD5 from the contigs file.
+    		my $correctMD5 = MD5Computer->new_from_fasta("$genomeLoc/contigs")->genomeMD5();
+    		$stats->Add(md5_checked => 1);
+    		if (! $metaHash->{md5} || $correctMD5 ne $metaHash->{md5}) {
+    			print "Correcting MD5 for $genome.\n";
+    			$stats->Add(md5_fixed => 1);
+    			$metaHash->{md5} = $correctMD5;
+    			$loader->WriteMetaData("$genomeLoc/genome-info", $metaHash);
+    		}
+    	}
     }
     # Close the output file.
     close $oh;

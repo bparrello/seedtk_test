@@ -493,6 +493,44 @@ sub ReadMetaData {
 	return \%retVal;
 }
 
+=head3 WriteMetaData
+
+	$loader->WriteMetaData($fileName, \%metaHash);
+
+Write the metadata specified by a hash to the specified file.
+
+=over 4
+
+=item fileName
+
+Name of the file to which the metadata should be written.
+
+=item metaHash
+
+Hash containing the key-value pairs to be output to the file. For each entry in the hash,
+a line will be written to the output file containing the key and the value, colon-separated.
+
+=back
+
+=cut
+
+sub WriteMetaData {
+	# Get the parameters.
+	my ($self, $fileName, $metaHash) = @_;
+	# Get the statistics object.
+	my $stats = $self->{stats};
+	# Open the output file.
+	open(my $oh, ">$fileName") || die "Could not open metadata output file $fileName: $!";
+	$stats->Add(metaFileOut => 1);
+	# Loop through the hash, writing key/value lines.
+	for my $key (sort keys %$metaHash) {
+		my $value = $metaHash->{$key};
+		print $oh "$key:$value\n";
+		$stats->Add(metaLineOut => 1);
+	}
+	# Close the output file.
+	close $oh;
+}
 
 =head2 General Loader Utility Methods
 
@@ -721,165 +759,6 @@ sub Check {
 	# Return the determination indicator.
 	return $retVal;
 }
-
-=head3 CurateNewGenomes
-
-	my $genomeMeta = $loader->CurateNewGenomes(\%genomeHash, $missingFlag, $clearFlag);
-
-This method will check for redundant genomes in a set of incoming genomes and delete conflicting
-genomes from the database. On exit, it will return a hash of the metadata for each nonredundant
-genome.
-
-The algorithm is complicated. We need to check for conflicts on genome ID and MD5 checksum,
-and we need to give priority to core genomes. The basic steps are as follows.
-
-=over 4
-
-=item 1
-
-Read in the ID, MD5, and type (core or not) for each genome in the database. If the clear-flag
-is set, the database is presumed to be empty.
-
-=item 2
-
-Read in all the metadata for the incoming genomes. Sort them by type code (first core, then
-non-core).
-
-=item 3
-
-Loop through the incoming genomes. If the genome has the same MD5 as a previously-seen input
-genome, it is discarded. If it matches a database genome on ID or MD5 and both have the same
-core status, it is discarded if the missing flag is set. Otherwise, it is discarded if the
-database genome is a core genome.
-
-=back
-
-The parameters are as follows.
-
-=over 4
-
-=item genomeHash
-
-Reference to a hash mapping each incoming genome ID to the source directory.
-
-=item missingFlag
-
-TRUE if existing genomes are preferred over new ones, else FALSE.
-
-=item clearFlag
-
-TRUE if the database is empty, else FALSE.
-
-=item RETURN
-
-Returns a hash keyed by genome ID that contains a metadata hash for each genome.
-
-=back
-
-=cut
-
-sub CurateNewGenomes {
-	# Get the parameters.
-	my ($self, $genomeHash, $missingFlag, $clearFlag) = @_;
-	# Get the statistics object.
-	my $stats = $self->{stats};
-	# Get the database object.
-	my $shrub = $self->{shrub};
-	# Get the data for all the genomes currently in the database. We will create two hashes, one keyed
-	# by MD5 that lists genome IDs, and one keyed by genome ID that lists the MD5 and the core-flag.
-	my %genomesById;
-	my %genomesByMd5;
-	# We only need to access the database if it has not been cleared.
-	if (! $clearFlag) {
-		print "Analyzing genomes currently in database.\n";
-		my $q = $shrub->Get('Genome', '', []);
-		while (my $genomeData = $q->Fetch()) {
-			my ($id, $md5, $core) = $genomeData->Values([qw(id md5-identifier core)]);
-			# Record the genome under its MD5.
-			push @{$genomesByMd5{$md5}}, $id;
-			# Record the genome's data.
-			$genomesById{$id} = [$md5, $core];
-			$stats->Add(existingGenomeRead => 1);
-		}
-	}
-	# Get the metadata for each genome. We'll put it in this hash.
-	my %retVal;
-	# We will also build a list of genome IDs in here.
-	my (@genomes, @nonCoreGenomes);
-	print "Reading incoming genome metadata.\n";
-	for my $genome (keys %$genomeHash) {
-		# Get this genome's source directory.
-		my $genomeDir = $genomeHash->{$genome};
-		# Read the metadata.
-		my $metaHash = $self->ReadMetaData("$genomeDir/genome-info", required => [qw(name md5 type)]);
-		# Is this a core genome?
-		if ($metaHash->{type} eq 'c') {
-			# Set the core flag to 1 (true) and store the genome in the core list.
-			$metaHash->{type} = 1;
-			push @genomes, $genome;
-		} else {
-			# Set the core flag to 0 (false) and store the genome in the non-core list.
-			$metaHash->{type} = 0;
-			push @nonCoreGenomes, $genome;			
-		}
-		# Save the genome's metadata in the return hash.
-		$retVal{$genome} = $metaHash;
-	}
-	# Get a list of all the incoming genomes, sorted core first.
-	push @genomes, @nonCoreGenomes;
-	# This will record the MD5s of genomes currently scheduled for addition.
-	my %incomingMD5s;
-	# Loop through the incoming genomes.
-	for my $genome (@genomes) {
-		# Get this genome's metadata and in particular its MD5.
-		my $metaHash = $retVal{$genome};
-		my $md5 = $metaHash->{md5};
-		# if there is a previous incoming genome with the same MD5, discard this one.
-		if ($incomingMD5s{$md5}) {
-			$stats->Add(newGenomeConflict => 1);
-			print "$genome discarded because of MD5 conflict with $incomingMD5s{$md5}.\n";
-		} else {
-			# Here we will build a list of genomes in the database that might conflict.
-			my @rivals;
-			# Check for an existing genome with the same ID.
-			if ($genomesById{$genome}) {
-				push @rivals, $genome;
-			}
-			# Check for existing genomes with the same MD5.
-			if ($genomesByMd5{$md5}) {
-				push @rivals, @{$genomesByMd5{$md5}};
-			}
-			# Loop through the rival genomes.
-			my $discard;
-			for my $rivalGenome (@rivals) {
-				# Get the rival genome's core flag.
-				my $rivalCore = $genomesById{$rivalGenome}[1];
-				# Discard the new genome if it has the same core status as the rival and the MISSING
-				# flag is set, or if the rival is a core genome. The net effect is that core genomes
-				# always win, and if there is a tie, the missing-flag makes the decision.
-				if ($rivalCore == $metaHash->{type} ? $missingFlag : $rivalCore) {
-					$discard = 1;
-				}
-			}
-			if ($discard) {
-				print "$genome skipped because of conflicts with existing genomes " . join(", ", @rivals) . "\n";
-				$stats->Add(genomeConflictSkip => 1);
-				# Remove the genome from the output hash.
-				delete $retVal{$genome}; 
-			} else {
-				$stats->Add(genomeKept => 1);
-				# Here we are keeping the genome. Delete the rivals.
-				for my $rival (@rivals) {
-					print "Deleting genome $rival to make way for $genome.\n";
-					my $newStats = $shrub->Delete(Genome => $rival);
-					$stats->Accumulate($newStats);
-				}
-			}
-		}
-	}
-	# Return the metadata hash.
-	return \%retVal;
-}  
 
 
 =head2 In-Memory Loader Table Utilities
