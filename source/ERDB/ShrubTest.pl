@@ -21,10 +21,12 @@
     use Stats;
     use SeedUtils;
     use Shrub;
-    use MD5Computer;
 
-	use constant LOADTABLES => qw(Genome Contig Feature Feature2Contig Feature2Function Genome2Contig Genome2Feature);
-
-print join(", ", LOADTABLES) . "\n";
-
-print join("\n", @INC, "");
+	$| = 1; # Prevent buffering on STDOUT.
+	# Connect to the database.
+	my ($shrub, $opt) = Shrub->new_for_script('%c %o', {}); 
+	my @functions = $shrub->GetAll('Function', [], '', 'id statement');
+	for my $function (@functions) {
+		print Pad($function->[0], 10, 1) . ". $function->[1]\n";
+	}
+ 

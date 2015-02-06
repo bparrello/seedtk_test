@@ -1301,83 +1301,6 @@ sub TraceImages {
 
 =head2 Command-Line Utility Methods
 
-=head3 SendSMS
-
-    my $msgID = Tracer::SendSMS($phoneNumber, $msg);
-
-Send a text message to a phone number using Clickatell. The FIG_Config file must contain the
-user name, password, and API ID for the relevant account in the hash reference variable
-I<$FIG_Config::phone>, using the keys C<user>, C<password>, and C<api_id>. For
-example, if the user name is C<BruceTheHumanPet>, the password is C<silly>, and the API ID
-is C<2561022>, then the FIG_Config file must contain
-
-    $phone =  { user => 'BruceTheHumanPet',
-                password => 'silly',
-                api_id => '2561022' };
-
-The original purpose of this method was to insure Bruce would be notified immediately when the
-Sprout Load terminates. Care should be taken if you do not wish Bruce to be notified immediately
-when you call this method.
-
-The message ID will be returned if successful, and C<undef> if an error occurs.
-
-=over 4
-
-=item phoneNumber
-
-Phone number to receive the message, in international format. A United States phone number
-would be prefixed by "1". A British phone number would be prefixed by "44".
-
-=item msg
-
-Message to send to the specified phone.
-
-=item RETURN
-
-Returns the message ID if successful, and C<undef> if the message could not be sent.
-
-=back
-
-=cut
-
-sub SendSMS {
-    # Get the parameters.
-    my ($phoneNumber, $msg) = @_;
-    # Declare the return variable. If we do not change it, C<undef> will be returned.
-    my $retVal;
-    # Only proceed if we have phone support.
-    if (! defined $FIG_Config::phone) {
-        Trace("Phone support not present in FIG_Config.") if T(1);
-    } else {
-        # Get the phone data.
-        my $parms = $FIG_Config::phone;
-        # Get the Clickatell URL.
-        my $url = "http://api.clickatell.com/http/";
-        # Create the user agent.
-        my $ua = LWP::UserAgent->new;
-        # Request a Clickatell session.
-        my $resp = $ua->post("$url/sendmsg", { user => $parms->{user},
-                                     password => $parms->{password},
-                                     api_id => $parms->{api_id},
-                                     to => $phoneNumber,
-                                     text => $msg});
-        # Check for an error.
-        if (! $resp->is_success) {
-            Trace("Alert failed.") if T(1);
-        } else {
-            # Get the message ID.
-            my $rstring = $resp->content;
-            if ($rstring =~ /^ID:\s+(.*)$/) {
-                $retVal = $1;
-            } else {
-                Trace("Phone attempt failed with $rstring") if T(1);
-            }
-        }
-    }
-    # Return the result.
-    return $retVal;
-}
-
 =head3 StandardSetup
 
     my ($options, @parameters) = StandardSetup(\@categories, \%options, $parmHelp, @ARGV);
@@ -1695,11 +1618,6 @@ sub StandardSetup {
             open STDERR, "| Tracer $traceFileName";
         } else {
             open STDERR, ">$errFileName";
-        }
-        # Check for phone support. If we have phone support and a phone number,
-        # we want to turn it on.
-        if ($ENV{PHONE} && defined($FIG_Config::phone)) {
-            $retOptions->{phone} = $ENV{PHONE};
         }
     }
     # Check for the "help" option. If it is specified, dump the command-line
@@ -3960,19 +3878,6 @@ on SiteMeter and Google Analytics.
 sub TrackingCode {
     # Declare the return variable.
     my $retVal = "<!-- tracking off -->";
-    # Determine if we're in production.
-    if ($FIG_Config::site_meter) {
-        $retVal = <<END_HTML
-	<!-- Site Meter -->
-	<script type="text/javascript" src="http://s20.sitemeter.com/js/counter.js?site=s20nmpdr">
-	</script>
-	<noscript>
-	<a href="http://s20.sitemeter.com/stats.asp?site=s20nmpdr" target="_top">
-	<img src="http://s20.sitemeter.com/meter.asp?site=s20nmpdr" alt="Site Meter" border="0"/></a>
-	</noscript>
-	<!-- Copyright (c)2006 Site Meter -->
-END_HTML
-    }
     return $retVal;
 }
 
