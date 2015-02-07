@@ -57,8 +57,9 @@ The positional parameter is the name of the genome directory.
     # Insure we have a genome directory.
     my ($genomeDir) = $ARGV[0];
     if (! $genomeDir) {
-    	die "No genome directory specified.";
-    } elsif (! -d $genomeDir) {
+    	$genomeDir = "$FIG_Config::shrub_dir/Inputs/GenomeData";
+    }
+    if (! -d $genomeDir) {
     	die "Invalid genome directory $genomeDir.";
     }
     # Open the output file.

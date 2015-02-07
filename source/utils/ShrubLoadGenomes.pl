@@ -19,15 +19,15 @@
 
 =head1 Shrub Genome Loader
 
-	ShrubLoadGenomes [options] directory genome1 genome2 ...
+	ShrubLoadGenomes [options] genome1 genome2 ...
 	
 This method loads one or more genomes from repository directories into the
 Shrub database. The genome data will be assembled into load files for
 each table, and then the tables loaded directly from the files.
 
-The positional parameters are the name of the directory containing the
-genome exchange directories, plus the names of the genomes to be loaded.
-The command-line parameters listed in L<Shrub/new_for_script> are accepted
+The positional parameters are names of the genomes to be loaded.
+
+The command-line options listed in L<Shrub/new_for_script> are accepted
 as well as the following.
 
 =over 4
@@ -58,6 +58,11 @@ function assignments will be ignored.
 
 Load all of the genomes in the genome directory. Mutually exclusive with C<genomes>.
 
+=item genomeDir
+
+Directory containing the genome source files. If not specified, the default will be
+computed from information in the FIG_Config file.
+
 =back
 
 =cut
@@ -86,6 +91,7 @@ Load all of the genomes in the genome directory. Mutually exclusive with C<genom
 			["override|o", "override existing protein function assignments"],
 			["clear|c", "clear the genome tables before loading"],
 			["all|a", "process all genomes in the genome directory"],
+			["genomeDir|g", "genome directory containing the data to load", { default => "$FIG_Config::shrub_dir/Inputs/GenomeData" }]
 		);
 	# We are connected. Create the loader utility object.
 	my $loader = ShrubLoader->new($shrub);
@@ -94,11 +100,10 @@ Load all of the genomes in the genome directory. Mutually exclusive with C<genom
 	# Get the statistics object.
 	my $stats = $loader->stats;
 	# Get the positional parameters.
-	my ($genomeDir, @genomes) = @ARGV;
+	my @genomes = @ARGV;
 	# Verify the genome directory.
-	if (! $genomeDir) {
-		die "No genome directory specified.";
-	} elsif (! -d $genomeDir) {
+	my $genomeDir = $opt->genomedir;
+	if (! -d $genomeDir) {
 		die "Invalid genome directory $genomeDir.";
 	}
 	# Get the list of genomes to load. We will store it in $genomeHash, as a hash mapping

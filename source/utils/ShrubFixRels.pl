@@ -31,7 +31,7 @@ link to entities that do not exist.
 
 The positional parameters are the relationship names.
 
-The command-line parameters are those described in L<Shrub/new_for_script> plus the
+The command-line options are those described in L<Shrub/new_for_script> plus the
 following.
 
 =over 4

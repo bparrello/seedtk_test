@@ -84,6 +84,11 @@ flat file and uploaded at the end of the run.
 
 Implies C<links>, C<prots>, and C<roles>.
 
+=item genomeDir
+
+Directory containing the genome source files. If not specified, the default will be
+computed from information in the FIG_Config file.
+
 =back
 
 The positional parameters are the name of the directory containing the genome repository and the
@@ -96,7 +101,7 @@ name of the directory containing the subsystem repository.
 	$| = 1; # Prevent buffering on STDOUT.
 	# Connect to the database.
 	print "Connecting to database.\n";
-	my ($shrub, $opt) = Shrub->new_for_script('%c %o genomeDirectory subsysDirectory', { },
+	my ($shrub, $opt) = Shrub->new_for_script('%c %o subsysDirectory', { },
 			["privilege|p=i", "privilege level for assignment", { default => 0 }],
 			["slow|s", "use individual inserts rather than table loads"],
 			["subsystems=s", "name of a file containing a list of the subsystems to use"],
@@ -106,16 +111,20 @@ name of the directory containing the subsystem repository.
 			["prots|P", "process proteins and functional assignments"],
 			["roles|R", "process subsystems and roles"],
 			["all|A", "process all functions (same as LPS)", { implies => ['links', 'prots', 'roles'] }],
+			["genomeDir|g", "genome directory containing the data to load", { default => "$FIG_Config::shrub_dir/Inputs/GenomeData" }]
 		);
 	# Get the positional parameters.
-	my ($genomeDirectory, $subsysDirectory) = @ARGV;
-	if (! $genomeDirectory) {
-		die "No genome directory specified.";
-	} elsif (! -d $genomeDirectory) {
+	my ($subsysDirectory) = @ARGV;
+	# Get the genome directory.
+	my $genomeDirectory = $opt->genomedir;
+	# Validate the directories.
+	if (! -d $genomeDirectory) {
 		die "Invalid genome directory $genomeDirectory.";
-	} elsif (! $subsysDirectory) {
-		die "No subsystem directory specified.";
-	} elsif (! -d $subsysDirectory) {
+	}
+	if (! $subsysDirectory) {
+		$subsysDirectory = "$FIG_Config::shrub_dir/Inputs/SubSystemData";
+	}
+	if (! -d $subsysDirectory) {
 		die "Invalid subsystem directory $subsysDirectory.";
 	}
 	# Validate the mutually exclusive options.
