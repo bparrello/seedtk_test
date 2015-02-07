@@ -19,79 +19,22 @@
 
 use strict;
 use Tracer;
-use ERDB;
-use ERDBExtras;
+use Shrub;
+use ShrubLoader;
 
+=head1 ShrubLoadFormat Script
 
-=head1 ERDBLoadFormat Script
-
-    ERDBLoadFormat [options] <database>
-
-ERDB Database Load Format Display
+    ShrubLoadFormat [options]
 
 =head2 Introduction
 
 This script displays in the form of a text file the information needed to
-create load files for the specified ERDB database.
-
-=head2 Positional Parameters
-
-=over 4
-
-=item database
-
-Name of the ERDB database. This should be the class name for the subclass used
-to access the database.
-
-=back
+create load files for the specified Shrub database.
 
 =head2 Command-Line Options
 
-=over 4
-
-=item trace
-
-Specifies the tracing level. The higher the tracing level, the more messages
-will appear in the trace log. Use E to specify emergency tracing.
-
-=item user
-
-Name suffix to be used for log files. If omitted, the PID is used.
-
-=item background
-
-Save the standard and error output to files. The files will be created
-in the FIG temporary directory and will be named C<err>I<User>C<.log> and
-C<out>I<User>C<.log>, respectively, where I<User> is the value of the
-B<user> option above.
-
-=item help
-
-Display this command's parameters and options.
-
-=item warn
-
-Create an event in the RSS feed when an error occurs.
-
-=item phone
-
-Phone number to message when the script is complete.
-
-=item DBD
-
-Fully-qualified name of the DBD file. This option allows the use of an alternate
-DBD during load so that access to the database by other processes is not
-compromised.
-
-=item dbName
-
-SQL name of the target database. If not specified, the default name is used.
-This option allows you to specify a backup or alternate database that can
-be loaded without compromising the main database.
-
-=item dbhost
-
-Name of the MySQL database host. If not specified, the default host is used.
+The command-line options are those found in L<Shrub/new_for_script> plus
+the following.
 
 =item entities
 
@@ -102,45 +45,37 @@ related to the entities will be displayed.
 
 =cut
 
-    # Get the command-line options and parameters.
-    my ($options, @parameters) = StandardSetup([qw(ERDB) ],
-                                               {
-                                                  dbName => ["", "if specified, the SQL name of the target database"],
-                                                  dbhost => ["", "if specified, the name of the target database"],
-                                                  port => ["", "if specified, the port on which to connect to the target database"],
-                                                  trace => ["2-", "tracing level"],
-                                                  DBD => ["", "if specified, the name of a DBD file in the FIG directory"],
-                                                  entities => ["", "if specified, the name of a file containing the entities of interest"]
-                                               },
-                                               "<database>",
-                                               @ARGV);
-    # Connect to the database.
-    my $erdb = ERDB::GetDatabase($parameters[0], undef, %$options, externalDBD => 1, offline => 1);
+	$| = 1; # Prevent buffering on STDOUT.
+	# Connect to the database.
+	my ($shrub, $opt) = Shrub->new_for_script('%c %o', {},
+			["entities", "If specified, the name of a file containing a list of entities of interest"]);
+    # Create the loader helper object.
+    my $loader = ShrubLoader->new($shrub);
     # Get the hash of entities.
-    my $entityHash = $erdb->GetObjectsTable('entity');
+    my $entityHash = $shrub->GetObjectsTable('entity');
     # Get the list of entities of interest.
-    my %entities;
-    if ($options->{entities}) {
-        %entities = map { $_ => $entityHash->{$_} } Tracer::GetFile($options->{entities});
+    my $entities = {};
+    if ($opt->entities) {
+        $entities = { map { $_ => $entityHash->{$_} } $loader->GetNamesFromFile($opt->entities, 'entity name') };
     } else {
-        %entities = %$entityHash;
+        $entities = \%$entityHash;
     }
     # Loop through the list of entities.
-    for my $entity (sort keys %entities) {
+    for my $entity (sort keys %$entities) {
         # Display the entity description.
-        DisplayObject($entity, \%entities);
+        DisplayObject($entity, $entities);
         # Space before the next entity.
         print "\n";
     }
     # Loop through the list of relationships.
-    my $relationshipHash = $erdb->GetObjectsTable('relationship');
+    my $relationshipHash = $shrub->GetObjectsTable('relationship');
     for my $relationship (sort keys %$relationshipHash) {
         # Get the FROM and TO entites.
         my $from = $relationshipHash->{$relationship}->{from};
         my $to = $relationshipHash->{$relationship}->{to};
         # Only display this relationship if both ends are in our
         # list of entities.
-        if (exists $entities{$from} && exists $entities{$to}) {
+        if (exists $entities->{$from} && exists $entities->{$to}) {
             DisplayObject($relationship, $relationshipHash);
             # Space before the next relationship.
             print "\n";

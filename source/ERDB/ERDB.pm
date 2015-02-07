@@ -2626,6 +2626,24 @@ sub GetEntityTypes {
 }
 
 
+=head3 GetRelationshipTypes
+
+    @rels = $erdb->GetRelationshipTypes();
+
+Return a list of all the relationship names in the database.
+
+=cut
+
+sub GetRelationshipTypes {
+    # Get the parameters.
+    my ($self) = @_;
+    # Get the relationship list from the metadata object.
+    my $relationshipList = $self->{_metaData}->{Relationships};
+    # Return the list of relationship names in alphabetical order.
+    return sort keys %$relationshipList;
+}
+
+
 =head3 GetConnectingRelationships
 
     my @list = $erdb->GetConnectingRelationships($entityName);
@@ -4421,7 +4439,6 @@ sub FixRelationship {
     # separately.
     for my $dir (qw(from to)) {
         my $entity = $entities{$dir};
-        $retVal->Add("${name}dir" => 1);
         # Loop through the entity IDs in this direction.
         # We process them in batches of 50.
         my @idList = ();
@@ -6437,7 +6454,7 @@ sub _SetupSQL {
             # No, so we need to compute its real name, put it in the
             # map hash, and add it to the FROM list. First, we strip
             # off any number suffix the caller supplied.
-            if ($alias =~ /^(\D+)(\d*)$/) {
+            if ($alias =~ /^(.+?)(\d*)$/) {
                 my ($baseName, $suffix) = ($1, $2);
                 # Does the base name exist in the database?
                 my $realName = $aliasTable->{$baseName};

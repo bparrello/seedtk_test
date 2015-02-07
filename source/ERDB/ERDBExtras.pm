@@ -81,15 +81,6 @@ the database server for unacceptable periods.
 
 our $delete_limit           = 0;
 
-=head3 cgi_url
-
-C<$ERDBExtras::cgi_url> specifies the URL of the CGI directory containing the
-ERDB web scripts.
-
-=cut
-
-our $cgi_url                = $FIG_Config::cgi_url || "/cgi-bin";
-
 =head3 diagram_url
 
 C<$ERDBExtras::diagramURL> specifies the URL of the ERDB diagramming engine.
@@ -97,7 +88,7 @@ This is a compiled flash movie file (SWF) used for the documentation widget.
 
 =cut
 
-our $diagramURL             = $FIG_Config::diagramURL || "$cgi_url/Html/Diagrammer.swf";
+our $diagramURL             = $FIG_Config::diagramURL || "lib/Diagrammer.swf";
 
 =head3 query_limit
 
@@ -108,24 +99,6 @@ to prevent denial-of-service attackes against the query engine.
 =cut
 
 our $query_limit            = 1000;
-
-=head3 css_dir
-
-C<$ERDBExtras::css_dir> specifies the directory containing the C<ERDB.css>
-file.
-
-=cut
-
-our $css_dir                = "$cgi_url/Html/css";
-
-=head3 js_dir
-
-C<$ERDBExtras::js_dir> specifies the directory containing the C<ERDB.js>
-file.
-
-=cut
-
-our $js_dir                 = "$cgi_url/Html";
 
 =head3 query_retries
 

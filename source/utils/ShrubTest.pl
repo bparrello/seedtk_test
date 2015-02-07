@@ -24,10 +24,9 @@
     use Tracer;
 
 	$| = 1; # Prevent buffering on STDOUT.
-	# Connect to the database.
-	my ($shrub, $opt) = Shrub->new_for_script('%c %o', {}); 
-	my @roles = $shrub->GetAll('Role', 'Role(ec-number) <> ?', [''], 'id ec-number statement');
-	for my $role (@roles) {
-		print Tracer::Pad($role->[0], 10, 1) . ". " . Tracer::Pad($role->[1], 12) . " $role->[2]\n";
-	}
- 
+	use constant HASHY => { "\\" => 1, "\$" => 2 };
+	
+	my $hashy = HASHY;
+	my $test = "abc\\def\$abc";
+	$test =~ s/([\\\$])/$hashy->{$1}/gs;
+	print $test;

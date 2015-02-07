@@ -1,0 +1,258 @@
+/* Style sheet for ERDBDocPage and others */
+
+div.doc {
+   font-family: Tahoma, Arial, sans-serif;
+   font-size: 10pt;
+   margin: 0px;
+   color: #000;
+   background-color: #FFF;
+}
+
+.doc h4 {
+    font-size: 12pt;
+}
+
+.doc h3 {
+    font-size: 14pt;
+}
+
+.doc h2 {
+    font-size: 18pt;
+}
+
+.doc h1 {
+    font-size: 24pt;
+}
+
+.doc hr {
+   color: #ccc;
+   background-color: #ccc;
+}
+
+.doc pre,
+.doc code,
+.doc tt,
+td.code {
+    font-family: Courier New, Courier, monospace;
+    color: #930;
+}
+
+textarea.common {
+   font-family: inherit;
+}
+
+.doc blockquote {
+   border-style: solid;
+   border-width: 3px;
+   border-color: #000;
+   background-color: #ff0;
+   padding: 2px;
+}
+
+.doc h1,
+.doc h2,
+.doc h3,
+.doc h4,
+.doc h5,
+.doc h6 {
+   color: #8C0015;
+   font-family: Garamond, Georgia, serif;
+}
+
+.fancy th {
+    background-color: #ccc;
+}
+
+.fancy tr.odd {
+    background-color: #fff;
+}
+
+.fancy tr.even {
+    background-color: #def;
+}
+
+table.fancy {
+    border: solid 1px #000;
+}
+
+.fancy tr,
+.fancy th,
+.fancy td {
+    vertical-align: top;
+    border-style: none;
+}
+
+.num td,
+.num th {
+    text-align: right;
+}
+
+.text th,
+.text td {
+    text-align: left;
+}
+
+.code th,
+.code td {
+    text-align: left;
+}
+
+/**
+ * These styles are used for POD documents.
+ **/
+
+#pod a.u {
+   text-decoration: none;
+}
+
+#pod a {
+   color: #85001C;
+}
+
+#pod dt {
+   
+}
+
+#pod code,
+#pod pre {
+   color: #00c;
+}
+
+#pod h3 {
+   background-color: #ccf;
+}
+
+/**
+ * Thie margin allows the user to scroll the bottom of the page up to
+ * the top of the iframe so it can be on-screen with the entry form.
+ **/
+
+#pod {
+   padding-bottom: 600px;
+}
+
+/**
+ * The styles in this section are used when displaying a TestUtils-style data
+ * structure dump.
+ **/
+
+#Dump {
+   font-family: Tahoma, Arial, sans-serif;
+   font-size: small;
+   font-weight: normal;
+   color: #000;
+   margin: 10px 0 0 0;
+   line-height: 120%
+}
+
+#Dump dd {
+   line-height: 110%;
+}
+
+#Dump p {
+   line-height: 110%;
+}
+
+#Dump a {
+   text-decoration: none;
+   font-weight: bold;
+   color: #00C;
+   cursor: pointer;
+}
+
+#Dump hr {
+   color: #CCCCCC;
+   background-color: #CCCCCC;
+}
+
+#Dump pre,
+#Dump code,
+#Dump tt {
+    font-family: Courier New, Courier, monospace;
+    color: #7A4707;
+}
+
+#Dump blockquote {
+   border-style: solid;
+   border-width: 3px;
+   border-color: #000;
+   background-color: #ff0;
+   padding: 2px;
+}
+
+.error {
+   background-color: #c00;
+   color: #fff;
+}
+
+#Dump h1,
+#Dump h2,
+#Dump h3,
+#Dump h4,
+#Dump h5,
+#Dump h6 {
+   color: #8C0015;
+   font-family: Garamond, Georgia, serif;
+}
+
+#Dump h1 a:link,
+#Dump h1 a:visited {
+   color: #8C0015;
+}
+
+#Dump h1 a:hover {
+   color: #fff;
+   background-color: #8C0015;
+}
+
+#Dump dt {
+   font-weight: bold;
+   background-color: #fcc;
+}
+
+#Dump th {
+   background-color: #ccc;
+   text-align: left;
+}
+
+#Dump table,
+#Dump th,
+#Dump td,
+#Dump tr {
+   border-style: double;
+   border-collapse: collapse;
+   vertical-align: top;
+   font-size: small;
+}
+
+#Dump table {
+   margin-top: 6px;
+}
+
+#Dump ol {
+   font-weight: bold;
+}
+
+#Dump dd {
+   margin-bottom: 0.5em;
+   margin-top: 0;
+}
+
+.item {
+   font-weight: normal;
+}
+
+.marker {
+   color: #0a0;
+   font-weight: bold;
+   font-style: italic;
+}
+
+blockquote.error {
+   text-align: center;
+   width: 60%;
+   padding: 3px;
+   margin: 5px auto;
+   background-color: #d00;
+   border: double #000;
+}

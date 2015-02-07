@@ -1,0 +1,100 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>SEEDtk Start Page</title>
+<link href="css/Basic.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+<div class="heading"><h1>SEEDtk Start Page</h1></div>
+<div id="Content">
+<div class="searchBar">
+        <h3><a href="http://www.amazon.com/" target="_blank">Amazon.com</a></h3>
+        <p></p><form method="get" action="http://www.amazon.com/s/ref=nb_sb_noss" name="search" target="_blank">
+            Select a product category
+            <select id="searchDropdownBox" name="url">
+                <option selected="selected" value="search-alias=aps">All Departments</option>
+                <option value="search-alias=instant-video">Amazon Instant Video</option>
+                <option value="search-alias=appliances">Appliances</option>
+                <option value="search-alias=mobile-apps">Apps for Android</option>
+                <option value="search-alias=arts-crafts">Arts, Crafts &amp; Sewing</option>
+                <option value="search-alias=automotive">Automotive</option>
+                <option value="search-alias=baby-products">Baby</option>
+                <option value="search-alias=beauty">Beauty</option>
+                <option value="search-alias=stripbooks">Books</option>
+                <option value="search-alias=mobile">Cell Phones &amp; Accessories</option>
+                <option value="search-alias=apparel">Clothing &amp; Accessories</option>
+                <option value="search-alias=electronics">Electronics</option>
+                <option value="search-alias=grocery">Grocery &amp; Gourmet Food</option>
+                <option value="search-alias=hpc">Health &amp; Personal Care</option>
+                <option value="search-alias=garden">Home, Garden &amp; Pets</option>
+                <option value="search-alias=industrial">Industrial &amp; Scientific</option>
+                <option value="search-alias=jewelry">Jewelry</option>
+                <option value="search-alias=digital-text">Kindle Store</option>
+                <option value="search-alias=magazines">Magazine Subscriptions</option>
+                <option current="parent" value="search-alias=movies-tv">Movies &amp; TV</option>
+                <option value="search-alias=digital-music">MP3 Downloads</option>
+                <option value="search-alias=popular">Music</option>
+                <option value="search-alias=mi">Musical Instruments</option>
+                <option value="search-alias=office-products">Office Products</option>
+                <option value="search-alias=shoes">Shoes</option>
+                <option value="search-alias=software">Software</option>
+                <option value="search-alias=sporting">Sports &amp; Outdoors</option>
+                <option value="search-alias=tools">Tools &amp; Home Improvement</option>
+                <option value="search-alias=toys-and-games">Toys &amp; Games</option>
+                <option value="search-alias=videogames">Video Games</option>
+                <option value="search-alias=watches">Watches</option>
+            </select><br>
+            Enter keywords to search the store
+            <input type="text" class="textFix" name="field-keywords"><br>
+            <input type="submit" value="Search">
+            </form>
+        <p></p>
+        <hr>
+        <h3><a href="http://www.google.com/search" target="_blank">Google</a></h3>
+        <p>
+            </p><form method="GET" action="http://www.google.com/search" target="_blank">
+            Select a search type
+            <select name="tbm">
+                <option selected="selected" value="">Web Page</option>
+                <option value="isch">Image</option>
+                <option value="nws">News</option>
+                <option value="shop">Shopping</option>
+                <option value="vid">Video</option>
+            </select><br>
+            Enter a search expression
+            <input type="text" class="textFix" name="q" value="" maxlength="255"><br>
+            <input type="hidden" name="hl" value="en">
+            <input type="submit" name="sa" value="Search">
+            </form>
+        <p></p>
+        <hr>
+        <h3><a href="http://www.imdb.com" target="_blank">IMDB</a></h3>
+        <p>
+            </p><form method="get" action="http://www.imdb.com/find" target="_blank">
+            Enter a name to search the Internet Movie Data Base<br>
+            <input type="hidden" name="s" value="All">
+            <input type="text" class="textFix" name="q"><br>
+            <input type="submit" value="Search">
+            </form>
+        <p></p>
+        <hr>
+        <h3><a href="http://www.wikipedia.org" target="_blank">Wikipedia</a></h3>
+        <p>
+            </p><form method="get" action="http://www.wikipedia.org/wiki/Special:Search" target="_blank">
+            Enter a word or phrase to search the Wikipedia encyclopedia
+            <input type="hidden" name="go" value="Go">
+            <input type="text" class="textFix" name="search" value=""><br>
+            <input type="submit" name="go" value="Search"><br>
+            </form>
+        <p></p>
+        <hr>
+    </div>
+    <div class="panel">
+    	<iframe name="landing" id="landing" src="Links.html" />
+    </div>
+    <br class="clear" />
+</div>
+</body>
+</html>

@@ -1,0 +1,434 @@
+@charset "utf-8";
+/* CSS Document */
+body {
+	background-image:url(RedNoise.jpg);
+	color: #fff;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: small;
+}
+
+body.borderless {
+	background-color: #000000;
+	background-image:none;
+}
+
+
+h1, h2, h3, h4, h5 { 
+	font-family: Georgia, "Times New Roman", Times, serif;
+	color: #ff0;
+}
+
+a {
+	color: #0ff; 
+}
+
+h1 a:visited,
+h1 a {
+	color: #ff0;
+	text-decoration: none;
+}
+
+div.hoppers {
+	width: 88px;
+	float: left;
+	margin-top: -8px;
+	margin-right: 1em;
+}
+
+a:visited {
+	color: #f0f; 
+}
+
+blockquote.rules a,
+blockquote.ability a {
+	color: #099;
+}
+
+blockquote.rules a:visited,
+blockquote.ability a:visited {
+	color: #909;
+}
+
+a.official {
+	/* links to official site */
+}
+
+a.pageLink {
+	/* links to internal pages */
+}
+
+ol.a {
+	list-style-type: lower-alpha;
+}
+
+ol.a ol {
+	list-style-type: lower-roman;
+}
+
+ol {
+	list-style-type: decimal;
+}
+
+ol ol {
+	list-style-type: lower-alpha;
+}
+
+ol ol ol {
+	list-style-type: lower-roman;
+}
+
+a.ruling {
+	padding: 2px;
+	background-color: #ff0;
+	color: #009 !important;
+	text-decoration: none;
+}
+
+.full {
+	font-family: inherit;
+	font-size: small;
+	width: 99%;
+	margin: 2px;
+}
+
+blockquote.ability,
+blockquote.rules {
+	padding: 5px;
+	margin: 5px;
+	background: #fff;
+	color: #000;
+}
+
+blockquote.alarm {
+	padding: 5px;
+	margin: 10px;
+	background: #900;
+	border: double #f00;
+}
+
+blockquote.rules h3,
+blockquote.rules h4 {
+	color: #009;
+}
+blockquote.alert {
+	background: #f00;
+}
+
+blockquote.example {
+	padding: 1em;
+	border: 1px #000 solid;
+	display: table;
+}
+
+.logo img {
+	margin-top: -21px;
+	width: 300px;
+	float: left;
+	border: none;
+}
+
+.hoppers img {
+	width: 88px;
+	float: none;
+	margin: 0;
+}
+
+div.heading {
+	text-align: center;
+	vertical-align: middle;
+}
+
+.heading img {
+	height: 40px;
+	width: inherit;
+	margin-top: 0;
+	float: none;
+	vertical-align: text-bottom;
+	padding-right: 5px;
+}
+
+div.searchBar {
+	float: left;
+	width: 200px;
+	margin: 0 2em 0 0;
+	font-size: x-small;
+}
+
+.searchBar h3 {
+	letter-spacing: 0.3em;
+	text-transform: uppercase;
+	text-align: center;
+}
+
+.searchBar input,
+.searchBar select {
+	width: 100%;
+	padding: 2px;
+	margin: 3px 0;
+}
+
+div.panel {
+	margin-left: 220px;
+	width: auto;
+}
+
+input.textFix {
+	width: 192px;
+}
+
+.clear {
+	height: 1px;
+	clear: both;
+}
+
+#Content {
+	background-color: #001;
+	border: ridge 5px #222;
+	padding: 5px;
+}
+
+#Footer,
+#Categories,
+#Content {
+	margin: 5px;
+}
+
+li {
+	margin-bottom: 3pt;
+}
+
+ul.nav {
+	margin: 4px auto;
+	display: table;
+	padding: 2px;
+}
+
+.nav li,
+div.indexItem {
+	border: outset #006;
+	background-color: #006;
+	margin-bottom: 0;
+}
+
+.nav li {
+	padding: 2px;
+	display: inline;
+	margin: 0 2px;
+}
+
+.nav a {
+	text-decoration: none;
+}
+
+.title {
+	font-style: italic;
+}
+
+a:hover {
+	background-color: #f00;
+	color: #fff;
+}
+
+div.catHead {
+	background-color: #000;
+	display: table-cell;
+	padding: 2px;
+}
+
+div.catData {
+	display: table-cell;
+	padding: 2px;
+	padding-left: 0.5em;
+}
+
+div.indexGroup {
+	float: left;
+	margin-bottom: 1em;
+}
+
+.faq {
+	font-weight: bold;
+	color: #ff0;
+}
+
+div.indexHead {
+	background-color: #600;
+	font-weight: bold;
+}
+
+div.indexItem {
+	width: 150px;
+	padding: 0;
+	margin: 0 2px;
+	text-align: center;
+}
+
+div.indexItem a {
+	text-decoration: none;
+}
+
+
+form.special {
+	height: 100px;
+	overflow: auto;
+}
+
+form.basic, form.special {
+	margin: 1em;
+	background-color: #333;
+}
+
+div.left {
+	float: left;
+	margin-left: 1em;
+}
+
+div.right {
+	float: right;
+	margin-right: 1em;
+}
+
+#Categories {
+	border-top: 2px solid #000;
+	border-bottom: 2px solid #000;
+}
+
+#Footer {
+	font-size: smaller;
+	border: groove #000;
+	padding: 2px;
+	margin-top: 1.5em;
+}
+
+/**
+ * The styles in this section are used when displaying a TestUtils-style data
+ * structure dump or POD document.
+ **/
+
+#Dump {
+   font-family: Tahoma, Arial, sans-serif;
+   font-size: small;
+   font-weight: normal;
+   color: #000;
+   background: #fff;
+}
+
+#Dump dd {
+   line-height: 110%;
+}
+
+#Dump dl {
+	margin-left: 5em;
+}
+
+#Dump p {
+   line-height: 110%;
+}
+
+#Dump a {
+   text-decoration: none;
+   font-weight: bold;
+   color: #00C;
+}
+
+#Dump hr {
+   color: #CCCCCC;
+   background-color: #CCCCCC;
+}
+
+#Dump pre,
+#Dump code,
+#Dump tt {
+    font-family: Courier New, Courier, monospace;
+    color: #7A4707;
+}
+
+#Dump blockquote {
+   border-style: solid;
+   border-width: 3px;
+   border-color: #000;
+   background-color: #ff0;
+   padding: 2px;
+}
+
+.error {
+   background-color: #c00;
+   color: #fff;
+}
+
+#Dump h1,
+#Dump h2,
+#Dump h3,
+#Dump h4,
+#Dump h5,
+#Dump h6 {
+   color: #8C0015;
+   font-family: Garamond, Georgia, serif;
+}
+
+#Dump h1 a:link,
+#Dump h1 a:visited {
+   color: #8C0015;
+}
+
+#Dump h1 a:hover {
+   color: #fff;
+   background-color: #8C0015;
+}
+
+#Dump dt {
+   font-weight: bold;
+   background-color: #fcc;
+}
+
+#Dump th {
+   background-color: #ccc;
+   text-align: left;
+}
+
+#Dump table,
+#Dump th,
+#Dump td,
+#Dump tr {
+   border-style: double;
+   border-collapse: collapse;
+   vertical-align: top;
+   font-size: small;
+}
+
+#Dump table {
+   margin-top: 6px;
+}
+
+#Dump ol {
+   font-weight: bold;
+}
+
+#Dump dd {
+   margin-bottom: 0.5em;
+   margin-top: 0;
+}
+
+.item {
+   font-weight: normal;
+}
+
+.marker {
+   color: #0a0;
+   font-weight: bold;
+   font-style: italic;
+}
+
+form#armyAnalysis {
+   text-align: center;
+   margin: 0 auto;
+   background-color: #666;
+   padding: 0.5em 1em;
+   display: table;
+}
+
+#landing {
+	width: 100%;
+	height: 800px;
+	border: none;
+}

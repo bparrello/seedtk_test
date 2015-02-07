@@ -863,7 +863,7 @@ sub BuildDiagram {
     my $erdb = $self->{erdb};
     my $dbdFileName = $erdb->GetMetaFileName();
    # Compute the URL of the DBD.
-    my $dbdURL = "$ERDBExtras::cgi_url/ErdbDbdPrint.cgi?xmlFileName=$dbdFileName";
+    my $dbdURL = "/ErdbDbdPrint.cgi?xmlFileName=$dbdFileName";
     # Compute the height and width for the diagram.
     my $height = $diagramData->{height} || 800;
     my $width = $diagramData->{width} || 750;
@@ -878,7 +878,7 @@ sub BuildDiagram {
     push @options, 'links="javascript"';
     my $options = join(" ", @options);
     # Compute the base URL.
-    my $base = "$ERDBExtras::cgi_url/ErdbDocWidget.cgi";
+    my $base = "/ErdbDocWidget.cgi";
     # Compute the output string to be written by the script.
     my $dwriter = qq(<object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" ) .
                   qq(codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=9,0,0,0" ) .

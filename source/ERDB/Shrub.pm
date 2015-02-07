@@ -132,7 +132,7 @@ sub new {
         $options{loadDirectory} = "$dirBase/LoadFiles";
     }
     my $dbd = $options{DBD} || $FIG_Config::shrub_dbd || "$dirBase/ShrubDBD.xml";
-    my $dbName = $options{dbName} || $FIG_Config::shrub || "seedtk_shrub";
+    my $dbName = $options{dbName} || $FIG_Config::shrubDB || "seedtk_shrub";
     my $userData = $options{userData} || $FIG_Config::userData || "seed/";
     my $dbhost = $options{dbhost} || $FIG_Config::dbhost || "seed-db-write.mcs.anl.gov";
     my $repository = $options{repository} || "$dirBase/DnaRepo";
