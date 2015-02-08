@@ -23,10 +23,4 @@
     use Shrub;
     use Tracer;
 
-	$| = 1; # Prevent buffering on STDOUT.
-	use constant HASHY => { "\\" => 1, "\$" => 2 };
-	
-	my $hashy = HASHY;
-	my $test = "abc\\def\$abc";
-	$test =~ s/([\\\$])/$hashy->{$1}/gs;
-	print $test;
+    print "Tested.\n";

@@ -4,7 +4,6 @@ package ERDBLoad;
 
     use strict;
     use Tracer;
-    use PageBuilder;
     use ERDB;
     use Stats;
 

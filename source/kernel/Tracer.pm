@@ -31,7 +31,6 @@ package Tracer;
     use Carp qw(longmess croak carp confess);
     use CGI;
     use Cwd;
-    use PageBuilder;
     use Digest::MD5;
     use File::Basename;
     use File::Path;
