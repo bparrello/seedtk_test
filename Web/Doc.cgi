@@ -108,6 +108,7 @@ sub FindPod {
         	@files = map { "$_/$modName" } @FIG_Config::scripts;
         } else {
          	@files = map { ("$_/$modName.pod", "$_/$modName.pm", "$_/pods/$modName.pod") } @INC;
+         	push @files, map { ("$_/$modName.pod", "$_/$modName.pm") } @FIG_Config::libs;
 		}
         # Find the first file that exists.
         for (my $i = 0; $i <= $#files && ! defined $retVal; $i++) {
