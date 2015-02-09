@@ -37,16 +37,16 @@
 	use constant SCRIPTS => qw(utils);
 	use constant LIBS => qw(config ERDB kernel);
 
-=head1 SEEDtk Configuration Utility
+=head1 Generate SEEDtk Configuration Files
 
-This method generates (or re-generates) the B<FIG_Config.pm> and B<UConfig.sh> files for a
+This method generates (or re-generates) the L<FIG_Config> and B<UConfig.sh> files for a
 SEEDtk environment.
 
 =head2 Parameters
 
 The positional parameters are the location of the data folder and the location
 of the web folder (see L<ReadMe> for more information about SEEDtk folders). If a 
-FIG_Config file already exists, this information is not needed-- the existing values 
+B<FIG_Config> file already exists, this information is not needed-- the existing values 
 will be used.
 
 The command-line options are as follows.
@@ -55,8 +55,8 @@ The command-line options are as follows.
 
 =item fc
 
-If specified, the name of the FIG_Config file for the output. If C<off>, no FIG_Config file
-will be written.
+If specified, the name of the B<FIG_Config> file for the output. If C<off>, no B<FIG_Config>
+file will be written.
 
 =item uc
 
@@ -66,12 +66,12 @@ the registry). This last is only possible under Windows.
 
 =item winmode
 
-If C<1>, the system will be configured for Windows; if C<2>, the system will be configured for Unix.
+If C<1>, the system will be configured for Windows; if C<0>, the system will be configured for Unix.
 If unspecified, the current operating system will be interrogated.
 
 =item clear
 
-If specified, the current FIG_Config values will be ignored, and the configuration information will
+If specified, the current B<FIG_Config> values will be ignored, and the configuration information will
 be generated from scratch.
 
 =item links
@@ -83,10 +83,10 @@ already exist.
 
 =head2 Notes for Programmers
 
-To add a new FIG_Config parameter, simply add a call to L<Env/WriteParam> to the
+To add a new L<FIG_Config> parameter, simply add a call to L<Env/WriteParam> to the
 L</WriteAllParams> method.
 
-To change the UConfig file, simply add a call to L<Env/WriteConfig> to the
+To change the B<UConfig> file, simply add a call to L<Env/WriteConfig> to the
 L</WriteAllConfigs> method.
 
 
@@ -188,7 +188,7 @@ L</WriteAllConfigs> method.
 
     RunFigConfig($fileName);
 
-Execute the FIG_Config module. This uses the PERL C<do> function, which
+Execute the L<FIG_Config> module. This uses the PERL C<do> function, which
 unlike C<require> can execute a module more than once, but requires error
 checking. The error checking is done by this method.
 
@@ -196,7 +196,7 @@ checking. The error checking is done by this method.
 
 =item fileName
 
-The name of the FIG_Config file to load.
+The name of the B<FIG_Config> file to load.
 
 =back
 

@@ -22,7 +22,7 @@
     use SeedUtils;
     use Shrub;
 
-=head1 Shrub Database Creator
+=head1 Create or Repair a Shrub Database
 
     ShrubCreate [options]
 

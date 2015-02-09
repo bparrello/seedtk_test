@@ -24,9 +24,9 @@
     use Shrub;
     use ShrubFunctionLoader;
 
-=head1 Shrub Subsystem Loader
+=head1 Load Subsystems Into the Shrub Database
 
-    ShrubLoadSubsystems [options] genomeDirectory subsysDirectory
+    ShrubLoadSubsystems [options] subsysDirectory
 
 This script loads subsystems, related proteins, and their assignments into the Shrub database. The protein assignments
 are taken from subsystems to insure they are of the highest quality. This process is used to prime
@@ -40,8 +40,8 @@ specifying the appropriate option (C<subs>, C<links>, and/or C<prots>).
 
 =head2 Parameters
 
-The positional parameters are the name of the directory containing the genome repository and the
-name of the directory containing the subsystem repository.
+The positional parameter is the name of the directory containing the subsystem source
+directory. If omitted, it will be computed from information in the L<FIG_Config> module.
 
 The command-line options are as specified in L<Shrub/new_for_script> plus
 the following.
@@ -92,7 +92,7 @@ Implies C<links>, C<prots>, and C<roles>.
 =item genomeDir
 
 Directory containing the genome source files. If not specified, the default will be
-computed from information in the FIG_Config file.
+computed from information in the L<FIG_Config> file.
 
 =back
 

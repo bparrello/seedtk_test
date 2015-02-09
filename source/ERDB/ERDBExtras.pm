@@ -18,9 +18,9 @@ package ERDBExtras;
 
 This module contains parameter declarations used by the ERDB system.
 
-A package called B<FIG_Config> must be somewhere in the PERL path. Parameters
+A package called L<FIG_Config> must be somewhere in the PERL path. Parameters
 that vary from server to server should go in there. Parameters common to the
-entire installation should go in here. Note that if B<FIG_Config> is empty,
+entire installation should go in here. Note that if L<FIG_Config> is empty,
 everything will still work.
 
 =cut
@@ -30,7 +30,7 @@ everything will still work.
 =head3 customERDBtypes
 
 C<$ERDBExtras::customERDBtypes> contains a list of the custom ERDB types associated
-with the current code base. This replaces the old B<FIG_Config> variable of the
+with the current code base. This replaces the old L<FIG_Config> variable of the
 same name. When a new custom type is created, it should be put in this list.
 
 =cut

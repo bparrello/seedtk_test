@@ -24,7 +24,7 @@
     use Shrub;
     use MD5Computer;
 
-=head1 Shrub Genome Source Repository Index Creator
+=head1 Generate an Index and/or MD5s for Genome Source Directories
 
     ShrubIndexGenomes [options] genomeDirectory
 

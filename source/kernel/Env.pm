@@ -78,7 +78,136 @@ sub GetRegKey {
 	return $retVal;
 }
 
-##TODO: GetRegValues, SetRegValue
+=head2 Environment Query Methods
+
+=head3 GetFigConfigs
+
+    my $varHash = Env::GetFigConfigs($fileName);
+
+Return a hash describing the variables in the specified L<FIG_Config> file.
+The file will be parsed for comments (one or more lines beginning with
+C<#>) followed by assignment statements. The assignment statements will
+be parsed to get the variable name and type (which can be scalar C<$> or
+list C<@>). The return hash will contain the name, comments, and value of
+each variable. List values will be converted to comma-separated lists.
+(Based on the type of thing in FIG_Config, this is not a high-risk
+approach.)
+
+=over 4
+
+=item fileName
+
+Name of the FIG_Config file.
+
+=item RETURN
+
+Returns a reference to a hash, keyed by variable name. Each variable is
+mapped to a reference to a two-element list consisting of the comment
+followed by the value.
+
+=back
+
+=cut
+
+sub GetFigConfigs {
+    # Get the parameters.
+    my ($fileName) = @_;
+    # Declare the return variable.
+    my %retVal;
+    # Open the file for input.
+    open(my $ih, "<$fileName") || die "Could not open $fileName: $!";
+    # This list will accumulate the current comment lines.
+    my @comments;
+    # Loop through the file.
+    while (! eof $ih) {
+    	my $line = <$ih>;
+    	# Determine the line type.
+    	if ($line =~ /^\s*#\s*(.*)/) {
+    		# Here we have a comment line. Accumulate it in the comment list.
+    		push @comments, $1;
+    	} elsif ($line =~ /^\s*our\s+([\$|\@])(\w+)\s*=/) {
+    		# Here we have an assignment. Save the variable name and type.
+    		my ($varType, $varName) = ($1, $2);
+    		# Create the comment.
+    		my $comment = join(" ", @comments);
+    		# Form the full name of the variable.
+    		my $fullName = $varType . 'FIG_Config::' . $varName;
+    		# Convert it into an expression for the variable value. We only
+    		# need to do this for lists.
+    		if ($varType eq '@') {
+    			$fullName = '"(" . join(", ", ' . $fullName . ') . ")"';
+    		}
+    		# Get the desired value.
+    		my $value = eval($fullName);
+    		if ($@) {
+    			die "Error evaluating $varName: $@";
+    		}
+    		# Store the information about this variable in the hash.
+    		$retVal{"$varType$varName"} = [$comment, $value];
+    	} else {
+    		# Here we have a separator line. We must clear the
+    		# comment list.
+    		@comments = ();
+    	}
+    }
+    # Return the result.
+    return \%retVal;
+}
+
+=head3 GetScripts
+
+	my $scriptHash = Env::GetScripts($dir);
+	
+Return a hash of the script files in each directory.
+
+=over 4
+
+=item dir
+
+Name of the directory shows scripts are to be computed.
+
+=item RETURN
+
+Returns a reference to a hash that maps each script name (without the path) to the title from its
+POD documentation.
+
+=back
+
+=cut
+
+sub GetScripts {
+	# Get the parameters.
+	my ($dir) = @_;
+	# Declear the return variable.
+	my %retVal;
+	# Open the directory.
+    opendir(my $dh, $dir) || die "Could not open directory $dir: $!";
+    # Find all the script files.
+    my @files = grep { $_ != /^\w+\.pl$/ } readdir($dh);
+    close $dh;
+    # Loop through the file names.
+    for my $file (@files) {
+    	# Open this file for input.
+    	if (! open(my $ih, "<$dir/$file")) {
+    		# Here the open failed. Store the error message.
+    		$retVal{$file} = "Error reading file: $!";
+    	} else {
+    		# We opened the file. Look for the heading comment.
+    		my $comment;
+    		while (! eof $ih && ! $comment) {
+    			my $line = <$ih>;
+    			if ($line =~ /^=head1\s+(.+)/) {
+    				$comment = $1;
+    			}
+    		}
+    		# Put the comment (or undef if there was none) in the hash.
+   			$retVal{$file} = $comment;
+    	}
+    }
+	# Return the hash.
+	return \%retVal;
+}
+
 
 =head2 Parameter Output Methods
 

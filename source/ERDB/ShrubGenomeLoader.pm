@@ -326,7 +326,8 @@ sub AnalyzeContigFasta {
 		my $contigHash = $self->_InitializeContig($1);
 		$stats->Add(contigHeaders => 1);
 		# Loop through the FASTA file.
-		while (my $line = <$ih>) {
+		while (! eof $ih) {
+			my $line = <$ih>;
 			# Is this a contig header?
 			if ($line =~ /^(\S+)/) {
 				# Yes. Close the old contig and start a new one.

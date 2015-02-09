@@ -2,6 +2,7 @@
 
     use strict;
     use lib 'lib';
+    use FIG_Config;
     use CGI;
     use TestUtils;
     use WebUtils;

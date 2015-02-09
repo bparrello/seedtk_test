@@ -17,7 +17,7 @@
 # http://www.theseed.org/LICENSE.TXT.
 #
 
-=head1 Shrub Genome Loader
+=head1 Load Genomes Into the Shrub Database
 
 	ShrubLoadGenomes [options] genome1 genome2 ...
 	
@@ -63,7 +63,7 @@ Load all of the genomes in the genome directory. Mutually exclusive with C<genom
 =item genomeDir
 
 Directory containing the genome source files. If not specified, the default will be
-computed from information in the FIG_Config file.
+computed from information in the L<FIG_Config> module.
 
 =back
 

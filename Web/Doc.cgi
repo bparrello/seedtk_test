@@ -6,6 +6,7 @@
     use lib 'lib';
     use WebUtils;
     use FIG_Config;
+    use Env;
 
 =head1 Documentation Display
 
@@ -15,6 +16,24 @@ and displayed. This provides a mechanism for access to the documentation
 on the testing server.
 
 The single CGI parameter is C<module>.
+
+Several special module names give special results.
+
+=over 4
+
+=item FIG_Config
+
+Display the project configuration parameters.
+
+=item ENV
+
+Display the system environment.
+
+=item scripts
+
+Display a list of the available command-line scripts.
+
+=back
 
 =cut
 
@@ -34,8 +53,92 @@ eval {
     my @lines;
     # Do we have a module?
     my $modName = $cgi->param('module');
-    if ($modName) {
-        # Try to find the module.
+    if ($modName eq 'FIG_Config') {
+    	# Here the user wants a dump of the FIG_Config. Get the data we need.
+    	my $configHash = Env::GetFigConfigs("$FIG_Config::source/config/FIG_Config.pm");
+    	# Start with a heading.
+    	push @lines, CGI::div({ class => 'heading' }, CGI::h1("FIG_Config"));
+    	# Start the output table.
+    	push @lines, CGI::start_div({ id => 'Dump' }),
+    			CGI::start_table({ class => 'vars' }),
+    			CGI::Tr(CGI::th(['name', 'description', 'value']));
+    	# Loop through the variables, adding table rows.
+    	for my $var (sort keys %$configHash) {
+    		my $varData = $configHash->{$var};
+    		push @lines, CGI::Tr(CGI::td([$var, @$varData]));
+    	}
+    	# Close off the table.
+    	push @lines, CGI::end_table(), CGI::br({ class => 'clear' });
+    	# Close off the display area.
+    	push @lines, CGI::end_div();
+    } elsif ($modName eq 'ENV') {
+    	# Here the user wants a dump of the environment variables.
+    	push @lines, CGI::div({ class => 'heading' }, CGI::h1("System Environment"));
+    	# Start the output table.
+    	push @lines, CGI::start_div({ id => 'Dump' }),
+    			CGI::start_table({ class => 'vars' }),
+    			CGI::Tr(CGI::th(['name', 'value']));
+    	# Loop through the environment variables, writing them out.
+    	for my $key (sort keys %ENV) {
+    		push @lines, CGI::Tr(CGI::td([$key, $ENV{$key}]));
+    	}
+    	# Close off the table.
+    	push @lines, CGI::end_table(), CGI::br({ class => 'clear' });
+    	# Close off the display area.
+    	push @lines, CGI::end_div();
+    } elsif ($modName eq 'scripts') {
+    	# Here the user wants a list of the command-line scripts.
+    	push @lines, CGI::div({ class => 'heading'}, CGI::h1("Command-Line Scripts"));
+    	push @lines, CGI::start_div({ id => 'Dump' });
+    	# Loop through the script directories.
+    	for my $dir (@FIG_Config::scripts) {
+    		# Get the base name of the path and use it as our section title.
+    		$dir =~ /(\w+)$/;
+    		push @lines, CGI::h2($1);
+			# Get a hash of the scripts in this directory.
+			my $scriptHash = Env::GetScripts($dir);
+			if (! scalar keys %$scriptHash) {
+				# Here there are none.
+				push @lines, CGI::p("No documented scripts found.");
+			} else {
+				# We need to loop through the scripts, displaying them.
+				# This variable will count undocumented scripts.
+				my @undoc;
+				# This variable will count documented scripts.
+				my $doc = 0;
+				# Do the looping.
+				for my $script (sort keys %$scriptHash) {
+					# Get the comment.
+					my $comment = $scriptHash->{$script};
+					# Are we documented?
+					if ($comment) {
+						# Yes. If this is the first one, start the list.
+						if (! $doc) {
+							push @lines, CGI::start_ol();
+						}
+						# Count this script and display it.
+						push @lines, CGI::li({ class => 'item' }, CGI::a({ href => "Doc.cgi?module=$script" }, $script) . 
+								": $comment");
+						$doc++;
+					} else {
+						# Undocumented script. Just remember it.
+						push @undoc, $script; 
+					}
+				}
+				# If we had documented scripts, close the list.
+				if ($doc) {
+					push @lines, CGI::end_ol();
+				}
+				# If we had undocumented scripts, list them.
+				if (scalar @undoc) {
+					push @lines, CGI::p("Undocumented scripts: " . join(", ", @undoc));
+				}
+			}
+    	}
+    	# Close off the display.
+    	push @lines, CGI::end_ul(), CGI::br({ class => 'clear' }), CGI::end_div();
+	} elsif ($modName) {
+        # Here we have a regular module. Try to find it.
         my $fileFound = FindPod($modName);
         if (! $fileFound) {
             push @lines, CGI::h3("Module $modName not found.");
@@ -43,7 +146,7 @@ eval {
             # We have a file containing our module documentation.
             # Tell the user its name.
             push @lines, CGI::div({ class => 'heading'}, CGI::h1($modName));
-            # Now we must convert the pod to hTML. To do that, we need a parser.
+            # Now we must convert the pod to HTML. To do that, we need a parser.
             my $parser = Pod::Simple::HTML->new();
             # Denote we want an index.
             $parser->index(1);
@@ -98,7 +201,7 @@ sub FindPod {
     my ($modName) = @_;
     # Declare the return variable.
     my $retVal;
-    # Only proceed if this is a reasonable Pod name.
+    # Insure the name is reasonable.
     if ($modName =~ /^(?:\w|::)+(?:\.pl)?$/) {
         # Convert the module name to a path.
         $modName =~ s/::/\//g;
@@ -124,5 +227,6 @@ sub FindPod {
     # Return the result.
     return $retVal;
 }
+
 
 1;

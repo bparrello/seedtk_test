@@ -309,7 +309,8 @@ div.right {
    font-size: small;
    font-weight: normal;
    color: #000;
-   background: #ff4;
+   background-image: url(YellowNoise.jpg);
+   background-attachment: fixed;
 }
 
 #Dump dd {
@@ -338,8 +339,9 @@ div.right {
 #Dump pre,
 #Dump code,
 #Dump tt {
-    font-family: Courier New, Courier, monospace;
-    color: #7A4707;
+	font-family: Courier New, Courier, monospace;
+	font-weight: bold;
+	color: #006666;
 }
 
 #Dump blockquote {

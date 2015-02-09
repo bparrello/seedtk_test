@@ -23,5 +23,9 @@
     use SeedUtils;
     use Shrub;
     use Tracer;
+    use Env;
+    use FIG_Config;
 
-    print "Tested.\n";
+	my $hash = Env::GetScripts("/Users/Bruce/git/SEEDtk/source/utils");
+	print "Done\n";
+

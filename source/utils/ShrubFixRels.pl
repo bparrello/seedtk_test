@@ -22,7 +22,7 @@
     use Tracer;
     use Shrub;
 
-=head1 Shrub Relationship Integrity Check
+=head1 Verify Relationship Integrity in a Shrub Database
 
     ShrubFixRels [options] dbName rel1 rel2 ...
 

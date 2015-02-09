@@ -22,7 +22,7 @@ use Tracer;
 use Shrub;
 use ShrubLoader;
 
-=head1 ShrubLoadFormat Script
+=head1 Display Shrub Table Load Formats
 
     ShrubLoadFormat [options]
 
