@@ -26,8 +26,8 @@ package Tracer;
     use FIG_Config;
     use base qw(Exporter);
     use vars qw(@EXPORT @EXPORT_OK);
-    @EXPORT = qw(Trace T TSetup QTrace Confess MemTrace Cluck Min Max Assert Open OpenDir TICK StandardSetup EmergencyKey ETracing Constrain Insure ChDir Emergency Warn TraceDump IDHASH);
-    @EXPORT_OK = qw(GetFile GetOptions Merge MergeOptions ParseCommand ParseRecord UnEscape Escape PrintLine PutLine);
+    @EXPORT = qw(Trace T TSetup QTrace Confess MemTrace Cluck Min Max Assert Open OpenDir TICK EmergencyKey ETracing Constrain Insure ChDir Emergency Warn TraceDump IDHASH);
+    @EXPORT_OK = qw(GetFile MergeOptions ParseRecord UnEscape Escape PrintLine PutLine);
     use Carp qw(longmess croak carp confess);
     use CGI;
     use Cwd;
@@ -2022,6 +2022,40 @@ sub PrintLine {
 
 
 =head2 Other Useful Methods
+
+=head3 MergeOptions
+
+    Tracer::MergeOptions(\%table, \%defaults);
+
+Merge default values into a hash table. This method looks at the key-value pairs in the
+second (default) hash, and if a matching key is not found in the first hash, the default
+pair is copied in. The process is similar to L</GetOptions>, but there is no error-
+checking and no return value.
+
+=over 4
+
+=item table
+
+Hash table to be updated with the default values.
+
+=item defaults
+
+Default values to be merged into the first hash table if they are not already present.
+
+=back
+
+=cut
+
+sub MergeOptions {
+    # Get the parameters.
+    my ($table, $defaults) = @_;
+    # Loop through the defaults.
+    while (my ($key, $value) = each %{$defaults}) {
+        if (!exists $table->{$key}) {
+            $table->{$key} = $value;
+        }
+    }
+}
 
 =head3 IDHASH
 

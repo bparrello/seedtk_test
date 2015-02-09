@@ -18,7 +18,12 @@
 #
 
 use strict;
+use lib 'lib';
+use Web_Config;
 use Tracer qw(:DEFAULT PrintLine);
+
+# We need access to ERDB stuff, which requires updating @INC.
+BEGIN { push @INC, "$FIG_Config::source/ERDB"; }
 use Shrub;
 use ERDBPDocPage;
 use ERDBExtras;

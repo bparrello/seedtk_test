@@ -171,13 +171,17 @@ computed from information in the L<FIG_Config> module.
 	# delete existing genomes that conflict with the incoming ones. At the end, $genomeMeta will be a
 	# hash mapping the ID of each genome we need to process to it metadata.
 	my $genomeMeta = $genomeLoader->CurateNewGenomes($genomeHash, $opt->missing, $opt->clear);
+	# These variables will be used to display progress.
+	my ($gCount, $gTotal) = (0, scalar(keys %$genomeMeta));
 	# Get the DNA repository directory.
 	my $dnaRepo = $shrub->DNArepo;
 	# Loop through the incoming genomes.
  	for my $genome (sort keys %$genomeHash) {
- 		print "Processing $genome.\n";
  		my $metaHash = $genomeMeta->{$genome};
  		if ($metaHash) {
+ 			# Here we're keeping this genome. Display our progress.
+ 			$gCount++;
+ 			print "Processing $genome ($gCount of $gTotal).\n";
 	 		# Get the input repository directory.
 	 		my $genomeLoc = $genomeHash->{$genome};
 	 		# Parse the genome name.
@@ -236,6 +240,8 @@ computed from information in the L<FIG_Config> module.
 	 		$funcLoader->ConnectPegFunctions($genome, $genomeLoc, $pegHash, priv => $priv);
  		}
  	}
+ 	# Unspool the load files.
+ 	$loader->Close();
  	# All done. Print the statistics.
  	my $totalTime = time - $startTime;
  	my $genomeCount = scalar keys %$genomeHash;

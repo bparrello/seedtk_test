@@ -124,3 +124,28 @@ Display the configuration variables and their values.
 
 =back
 
+=head1 Setting up a Unix Environment
+
+First, you need a user name and password on GITHUB, and it must be an authorized contributor to the C<seedtk_test>
+repository.
+
+Position in your home directory. In the examples below, it will be assumed your user name is C<username>. Simply
+substitute your real username when typing the commands. 
+
+Clone the repository using GIT.
+
+	git clone https://username@github.com/bparrello/seedtk_test.git SEEDtk
+
+You will be prompted for a password. A new directory C<SEEDtk> will be created at the current
+location and the SEEDtk files will be loaded into it.
+
+At this point I recommend changing to the SEEDtk directory, as it simplifies most of the paths
+you'll have to type.
+
+	cd SEEDtk
+
+
+
+
+
+

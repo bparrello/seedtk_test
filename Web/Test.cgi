@@ -2,11 +2,15 @@
 
     use strict;
     use lib 'lib';
-    use FIG_Config;
+    use Web_Config;
     use CGI;
     use TestUtils;
     use WebUtils;
     use XML::Simple;
+    # Apache only includes the kernel library, and this script needs them all.
+    use FIG_Config;
+    BEGIN { unshift @INC, @FIG_Config::libs; }
+    use Shrub;
 
 print CGI::header();
 print CGI::start_html(-title => 'Test Page',
@@ -15,19 +19,15 @@ print CGI::start_html(-title => 'Test Page',
 eval {
     # Get the script.
     my $cgi = CGI->new();
-    my $script = $cgi->param('perlScript');
-    # Declare the return variable.
+    my $struct = $cgi->param('structure');
+    # Get the structure.
     my $retVal;
-    # Is there a script?
-    if ($script) {
-        # Yes, execute it and check for errors.
-        eval($script);
-        if ($@) {
-            Die("SCRIPT ERROR: $@");
-        }
+    if ($struct eq 'Shrub DBD') {
+    	$retVal = Shrub->new(offline => 1);
+    } elsif ($struct eq 'Shrub Object') {
+    	$retVal = Shrub->new();
     } else {
-        # No, call the default test method.
-        $retVal = TEST();
+    	die "Unknown structure requested."
     }
     # Dump the result.
     print CGI::start_div({ id => 'Dump' });
@@ -38,14 +38,5 @@ if ($@) {
     print CGI::blockquote($@);
 }
 print CGI::end_html();
-
-# Default test.
-sub TEST {
-    my $retVal;
-    #---------------
-    #### CODE IN HERE ####
-    #---------------
-    return $retVal;
-}
 
 1;

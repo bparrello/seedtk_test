@@ -5,7 +5,7 @@
     use Pod::Simple::HTML;
     use lib 'lib';
     use WebUtils;
-    use FIG_Config;
+    use Web_Config;
     use Env;
 
 =head1 Documentation Display

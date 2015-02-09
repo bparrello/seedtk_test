@@ -27,5 +27,7 @@
     use FIG_Config;
 
 	my $hash = Env::GetScripts("/Users/Bruce/git/SEEDtk/source/utils");
-	print "Done\n";
+	my $frog;
+	my $test = $frog . "123";
+	print "$test Done\n";
 

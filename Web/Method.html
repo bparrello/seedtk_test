@@ -189,46 +189,35 @@ function GenerateModule(formID) {
 </head>
 <body class="borderless">
 
-    <h1>Debugging Page</h1>
-    <form id="MethodForm" method="post" action=".">
-      <h2>Method Generator</h2>
+    <h1>Method Generator</h1>
+    <form id="MethodForm" method="post" action="Test.cgi" target="testFrame">
       <table width="100%" border="1">
 	<tr>
 	  <td width="75">Signature</td>
-	  <td colspan="4" align="center"><input name="Signature" type="text" id="Signature" class="full" /></td>
+	  <td colspan="2" align="center"><input name="Signature" type="text" id="Signature" class="full" /></td>
 	</tr>
 	<tr>
 	  <td width="75" valign="top">Description</td>
-	  <td colspan="3" align="center"><textarea name="Description" style="height:10em" class="full"></textarea></td>
+	  <td align="center"><textarea name="Description" style="height:10em" class="full"></textarea></td>
 	  <td width="100" align="center" valign="top"><input type="button" style="width: 95%" onClick="GenerateModule('MethodForm')" value="Generate" /><br /><br />
 	    <input type="checkbox" name="DocOnly" />
 	  <label for="DocOnly">Doc Only</label></td>
 	</tr>
 	<tr>
 	  <td width="75" valign="top">Result</td>
-	  <td colspan="3" align="center"><textarea name="Result" style="height:10em" class="full"></textarea></td>
+	  <td align="center"><textarea name="Result" style="height:10em" class="full"></textarea></td>
 	  <td width="100" align="center" valign="top"><input type="button" style="width: 95%" onClick="ClearForm('MethodForm')" value="Clear Form" /></td>
 	</tr>
 	<tr>
-	  <td width="75" valign="top">XML File</td>
-	  <td width="150"><select id="pathSelect" style="margin: 2px">
-	     <!-- XML file name options in here -->
-	  </select></td>
-	  <td width="75" valign="top">Name</td>
-	  <td align="center"><input id="xmlName" type="text" class="full" xmlpath="XmlPath"" /></td>
-	  <td width="100" align="center" valign="top"><input type="button" style="width: 95%" onclick="ShowXML()" value="View XML" /></td>
+	  <td width="75" valign="middle">Structures</td>
+      <td>
+      	<input type="submit" name="structure" value="Shrub DBD" style="width: 10em" />
+      	<input type="submit" name="structure" value="Shrub Object" style="width: 10em" />
+      </td>
+      <td>&nbsp;</td>
 	</tr>
       </table>
-    </form>
-    <form action="Test.cgi" method="POST" target="testFrame">
-	<h2>Test Script</h2>
-	<p>The test module will display the value of <code>$retVal</code>.</p>
-	<p><textarea name="perlScript" style="width: 100%; font-size: small; height: 200px;"></textarea></p>
-	<p style="text-align: center">
-	  <input type="submit" name="button" id="button" value="Submit" />
-	</p>
-    </form>
-    <center><iframe name="testFrame" width="800px" height="800px"></iframe></center>
+    <center><iframe name="testFrame" width="100%" height="800px"></iframe></center>
 
 <div style="clear: both; height: 1px"></div>
 </body>

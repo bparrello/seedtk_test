@@ -1,13 +1,13 @@
 package Env;
 
     use strict;
+    use File::Spec;
     
     # This prevents a compiler warning for the registry stuff if we end up
     # not loading Win32::Registry.
-{
-   	package main;
-   	use vars qw($HKEY_LOCAL_MACHINE $HKEY_CURRENT_USER $HKEY_CLASSES_ROOT);
-}
+	package main {
+   		use vars qw($HKEY_LOCAL_MACHINE $HKEY_CURRENT_USER $HKEY_CLASSES_ROOT);
+	}
 
 =head1 Environment Modification Utilities
 
@@ -183,7 +183,7 @@ sub GetScripts {
 	# Open the directory.
     opendir(my $dh, $dir) || die "Could not open directory $dir: $!";
     # Find all the script files.
-    my @files = grep { $_ != /^\w+\.pl$/ } readdir($dh);
+    my @files = grep { $_ =~ /^\w+\.pl$/ } readdir($dh);
     close $dh;
     # Loop through the file names.
     for my $file (@files) {
@@ -210,6 +210,60 @@ sub GetScripts {
 
 
 =head2 Parameter Output Methods
+
+=head3 BuildPathList
+
+	my $pathString = Env::BuildPathList($winMode, $delim, @paths);
+
+Build a string that contains a list of file paths. The file paths will be
+normalized into the appropriate form based on the target operating system.
+
+=over 4
+
+=item winMode
+
+TRUE if the target is Windows, else FALSE.
+
+=item delim
+
+Delimiter to use for separating the paths.
+
+=item paths
+
+List of paths to join into the output string.
+
+=item RETURN
+
+Returns a delimited list of the path strings.
+
+=back
+
+=cut
+
+sub BuildPathList {
+	# Get the parameters.
+	my ($winMode, $delim, @paths) = @_;
+	# The normalized paths will be put in here.
+	my @normals;
+	for my $path (@paths) {
+		# Is this Windows?
+		if ($winMode) {
+			# Yes. Convert the slashes.
+			$path =~ tr/\//\\/;
+			# Insure we have a drive letter.
+			if ($path !~ /^\w:/) {
+				$path = "C:$path";
+			}
+		}
+		# Save the modified path.
+		push @normals, $path;
+	}
+	# Form the result string.
+	my $retVal = join($delim, @normals);
+	# Return it.
+	return $retVal;
+}
+
 
 =head3 WriteLines
 
@@ -242,7 +296,7 @@ sub WriteLines {
     		$line = "    $line";
     	}
     	# Write the line.
-    	print "$line\n";
+    	print $oh "$line\n";
     }
 }
 
@@ -304,8 +358,22 @@ sub WriteParam {
     	}
     	$value = join("", @output, '"');
     }
-    # Write a blank line followed by the parameter's comment and value.
-    WriteLines($oh, "", $comment, "our $varName = $value");
+    # Create the list of comment lines. First, we split the comment
+    # into words.
+    my @words = split " ", $comment;
+    # Build the comment lines in here.
+    my @comments = ("#");
+    my $i = 0;
+    for my $word (@words) {
+    	if (length($comments[$i]) + length($word) > 60) {
+    		$comments[++$i] = "# $word";
+    	} else {
+    		$comments[$i] .= " $word";
+    	}
+    }
+    
+    # Write a blank line followed by the parameter's comments and value.
+    WriteLines($oh, "", @comments, "our \$$varName = $value;");
 }
 
 
