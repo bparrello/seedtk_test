@@ -25,6 +25,8 @@ This method loads one or more genomes from repository directories into the
 Shrub database. The genome data will be assembled into load files for
 each table, and then the tables loaded directly from the files.
 
+=head2 Parameters
+
 The positional parameters are names of the genomes to be loaded.
 
 The command-line options listed in L<Shrub/new_for_script> are accepted

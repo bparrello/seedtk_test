@@ -32,6 +32,10 @@ This script reads the hierarchy of a genome repository and creates its index fil
 
 This script loads the DBD but does not connect to the database.
 
+=head2 Parameters
+
+The single positional parameter is the name of the genome directory.
+
 The command-line options are as specified in L<Shrub/new_for_script> plus the
 following.
 
@@ -42,8 +46,6 @@ following.
 If specified, the script will recompute each genome's MD5 from its contigs file.
 
 =back
-
-The positional parameter is the name of the genome directory.
 
 =cut
 

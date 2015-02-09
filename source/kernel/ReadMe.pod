@@ -1,0 +1,96 @@
+=head1 SEEDtk Project Notes
+
+This file contains important notes about the SEEDtk programming environment.
+
+=head1 Directory Configuration
+
+The default directory structure includes a I<data directory>, a I<source directory>,
+and a I<web directory>.
+
+=head2 The Source Directory
+
+The source directory will generally be stored somewhere controlled by the GIT
+source control system. Inside the source directory are four important folders.
+
+=over 4
+
+=item config
+
+This contains the configuration files. The folder contains a C<.gitignore> file
+that prevents any of its contents from being pushed to the source control
+repository. This means that items in this directory are not shared.
+
+=item utils
+
+This contains the main scripts.
+
+=item kernel
+
+This contains the kernel PERL modules.
+
+=item ERDB
+
+This contains the PERL modules for the ERDB database layer.
+
+=back
+
+=head3 FIG_Config
+
+The structural information about the SEEDtk environment is kept in the L<FIG_Config> file
+in the B<config> directory. You can add new PERL library folders by putting them in the
+B<@plibs> variable and new script folders by putting them in the B<@pscripts> variable.
+After changing the FIG_Config, run the L<Configure.pl> script with the C<--fc=off> option,
+which will update the environment script C<Uconfig.sh>. After updating this script, 
+you will need to restart your shell and do another
+
+	source UConfig.sh
+
+command.
+
+In Windows, you can direct L<Configure.pl> to write environment information to the
+system registry. If this is the case, you must reboot the system to access the
+new environment. 
+
+=head2 The Data Directory
+
+Inside the data directory there are three main folders.
+
+=over 4
+
+=item DnaRepo
+
+The repository for DNA sequences, generally in the form of contig FASTA files.
+
+=item Inputs
+
+The default holding place for data to be loaded into the database. Genome
+directories are stored in C<Inputs/GenomeData> and subsystem directories in
+C<Inputs/SubSystemData>.
+
+=item LoadFiles
+
+The storage directory for the files used to load the database.
+
+=back
+
+=head2 The Web Directory
+
+The web directory contains files that produce a web site with useful development
+features. This web site is designed for use as a localhost server on a laptop
+or desktop PC as opposed to on an actual Unix server. This requires a great
+deal of setup, so its use is entirely optional; however, it provides the
+benefits of easy access to the POD documentation, quick testing of simple PERL
+scripts, and display of the DBD.
+
+If you do not intend to use the localhost server, the only purpose for the
+Web directory is to provide a default location for the temporary files.
+This is in the C<Tmp> subfolder.
+
+The main page has a list of search boxes including one labeled C<SEEDTK CODE>.
+Type the name of a perl module in this box, or the name of a script (including
+the C<.pl> suffix) to see the relevant POD documentation. Use the B<Links>
+button to bring up the C<Links.html> page. This is a page where you can put
+useful web site links. Use the B<Methods> button to bring up a page that
+generates PERL method documentation and allows testing of simple scripts.
+Use the B<DBD> button to bring up the Shrub database diagram.
+

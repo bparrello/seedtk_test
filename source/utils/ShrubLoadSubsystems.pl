@@ -38,6 +38,11 @@ be performed. The default is to do nothing (which is pretty useless). If you spe
 option, all three functions will be performed. Otherwise, the individual functions can be turned on by
 specifying the appropriate option (C<subs>, C<links>, and/or C<prots>).
 
+=head2 Parameters
+
+The positional parameters are the name of the directory containing the genome repository and the
+name of the directory containing the subsystem repository.
+
 The command-line options are as specified in L<Shrub/new_for_script> plus
 the following.
 
@@ -90,9 +95,6 @@ Directory containing the genome source files. If not specified, the default will
 computed from information in the FIG_Config file.
 
 =back
-
-The positional parameters are the name of the directory containing the genome repository and the
-name of the directory containing the subsystem repository.
 
 =cut
 

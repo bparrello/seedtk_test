@@ -31,6 +31,10 @@ will be destroyed. (Tables not normally found in a Shrub database, however, will
 
 This method always uses an external DBD, ignoring the DBD stored in the database (if any).
 
+=head2 Parameters
+
+There are no positional parameters.
+
 The command-line options are as specified in L<Shrub/new_for_script> plus
 the following.
 
@@ -53,8 +57,6 @@ will be ignored.
 Store the DBD in the database to improve performance.
 
 =back
-
-There are no positional parameters.
 
 =cut
 

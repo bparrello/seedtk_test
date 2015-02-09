@@ -20,6 +20,7 @@
     use strict;
     use File::Basename;
     use File::Spec;
+    use File::Copy;
     use Getopt::Long::Descriptive;
 
 	# We don't have access to the normal SEEDtk libraries because
@@ -34,17 +35,19 @@
 	
 	## THESE TWO CONSTANTS DEFINE THE SCRIPT and PM LIBRARIES.
 	use constant SCRIPTS => qw(utils);
-	use constant LIBS => qw(ERDB kernel);
+	use constant LIBS => qw(config ERDB kernel);
 
 =head1 SEEDtk Configuration Utility
 
 This method generates (or re-generates) the B<FIG_Config.pm> and B<UConfig.sh> files for a
 SEEDtk environment.
 
-The single positional parameter is the location of the data folder. This folder should
-have a C<Data> subfolder containing the data files and a C<Web> folder containing the
-web root. If a FIG_Config file already exists, this information is not needed-- the
-existing values will be used.
+=head2 Parameters
+
+The positional parameters are the location of the data folder and the location
+of the web folder (see L<ReadMe> for more information about SEEDtk folders). If a 
+FIG_Config file already exists, this information is not needed-- the existing values 
+will be used.
 
 The command-line options are as follows.
 
@@ -65,6 +68,16 @@ the registry). This last is only possible under Windows.
 
 If C<1>, the system will be configured for Windows; if C<2>, the system will be configured for Unix.
 If unspecified, the current operating system will be interrogated.
+
+=item clear
+
+If specified, the current FIG_Config values will be ignored, and the configuration information will
+be generated from scratch.
+
+=item links
+
+If specified, a prototype C<Links.html> file will be generated in the web directory if one does not
+already exist.
 
 =back
 
@@ -90,38 +103,45 @@ L</WriteAllConfigs> method.
 	# Determine the operating system.
 	my $winMode = ($^O =~ /Win/ ? 1 : 0);
 	# Analyze the command line.
-	my ($opt, $usage) = describe_options('%o %c dataRootDirectory',
+	my ($opt, $usage) = describe_options('%o %c dataRootDirectory webRootDirectory',
 			["winmode|w=i", "\"1\" for Windows, \"0\" for Unix", { default => $winMode }],
+			["clear|c", "ignore current configuration values"],
 			["fc=s", "name of a file to use for the FIG_Config output, or \"off\" to turn off FIG_Config output",
 					{ default => "$base_dir/config/FIG_Config.pm" }],
 			["uc=s", "name of a file to use for the UConfig output, \"off\" to turn off UConfig output, or \"sys\" to write directly to the environment",
 					{ default => "$base_dir/config/UConfig.sh" }],
+			["links", "generate Links.html file"],
 			);
 	print "Analyzing directories.\n";
-	# The data root directory will be put in here.
-	my $dataRootDir = '';
-	# Check for an existing FIG_Config. If there isn't one, we need to 
-	# create it.
+	# The root directories will be put in here.
+	my ($dataRootDir, $webRootDir) = ('', '');
+	# Get the name of the real FIG_Config file (not the output file,
+	# if one was specified, the real one).
 	my $fig_config_name = "$base_dir/config/FIG_Config.pm";
-	if (! -f $fig_config_name) {
-		# Creatge an empty FIG_Config file.
-		my $fh = Tracer::Open(undef, ">$fig_config_name");
-		print "package FIG_Config\n";
-		print "1;";
-		close $fh;
+	# Now we want to get the current environment. If the CLEAR option is
+	# specified or there is no file present, we stay blank; otherwise, we 
+	# load the existing FIG_Config.
+	if (! $opt->clear && -f $fig_config_name) {
+		RunFigConfig($fig_config_name);
 	}
-	# Now load the existing FIG_Config variables.
-	RunFigConfig();
-	# Do we have URL values? If not, remember it.
-	my $newUrls = (! defined $FIG_Config::temp_url);
-	# Make sure we have the data directories if there is no data root
+	# Make sure we have the data directory if there is no data root
 	# in the command-line parameters.
 	if (! defined $FIG_Config::shrub_dir) {
 		$dataRootDir = $ARGV[0];
 		if (! defined $dataRootDir) {
-			die "A data root directory is required if no current values exist in FIG_Config.";
+			die "A data root directory is required if no current value exists in FIG_Config.";
 		} elsif (! -d $dataRootDir) {
 			die "The specified data root directory $dataRootDir was not found.";
+		}
+	}
+	# Make sure we have the web directory if there is no web root in
+	# the command-line parameters.
+	if (! defined $FIG_Config::web_dir) {
+		$webRootDir = $ARGV[1];
+		if (! defined $webRootDir) {
+			die "A web root directory is required if no current value exists in FIG_Config.";
+		} elsif (! -d $webRootDir) {
+			die "The specified web root directory $webRootDir was not found.";
 		}
 	}
 	#If the FIG_Config write has NOT been turned off, then write the FIG_Config.
@@ -130,7 +150,7 @@ L</WriteAllConfigs> method.
 		print "FIG_Config output suppressed.\n";
 	} else {
 		# Write the FIG_Config.
-		WriteAllParams($opt->fc, $base_dir, $dataRootDir, $opt);
+		WriteAllParams($opt->fc, $base_dir, $dataRootDir, $webRootDir, $opt);
 		# Execute it to get the latest variable values.
 		print "Reading back new configuration.\n";
 		RunFigConfig($opt->fc);
@@ -142,12 +162,27 @@ L</WriteAllConfigs> method.
 	} else {
 		# Write the UConfig.
 		WriteAllConfigs($opt->uc, $base_dir, $opt);
-	}	
-	print "All done.\n";
-	if ($newUrls) {
-		# Here new URL values were computed. Warn the user about updating them.
-		print "If you are not hosting the web services locally, you may need to edit the URL parameters.\n";
 	}
+	# Finally, check for the links file.
+	if ($opt->links) {
+		# Determine the output location for the links file.
+		my $linksDest = "$FIG_Config::web_dir/Links.html";
+		# Do we need to generate a links file?
+		if (-f $linksDest) {
+			# No need. We already have one.
+			print "$linksDest file already exists-- not updated.\n";
+		} else {
+			# We don't have a links file yet.
+			print "Generating new $linksDest.\n";
+			# Find the source copy of the file.
+			my $linksSrc = "$base_dir/utils/Links.html";
+			# Copy it to the destination.
+			copy $linksSrc, $linksDest;	
+		}
+	}
+	print "All done.\n";
+	
+=head2 Internal Subroutines
 		
 =head3 RunFigConfig
 
@@ -155,16 +190,21 @@ L</WriteAllConfigs> method.
 
 Execute the FIG_Config module. This uses the PERL C<do> function, which
 unlike C<require> can execute a module more than once, but requires error
-checking. The error checking is done by this method. If no parameter is
-specified, the default FIG_Config is executed. If a parameter is specified,
-it is used as the name of the file to execute.
+checking. The error checking is done by this method.
+
+=over 4
+
+=item fileName
+
+The name of the FIG_Config file to load.
+
+=back
 
 =cut
 
 sub RunFigConfig {
 	# Get the parameters.
 	my ($fileName) = @_;
-	$fileName //= 'FIG_Config.pm'; 
 	# Execute the FIG_Config;
 	do $fileName;
 	if ($@) {
@@ -211,7 +251,7 @@ Command-line options object.
 
 sub WriteAllParams {
     # Get the parameters.
-    my ($fig_config_name, $base_dir, $dataRootDir, $opt) = @_;
+    my ($fig_config_name, $base_dir, $dataRootDir, $webRootDir, $opt) = @_;
     # Open the FIG_Config for output.
     my $oh = Tracer::Open(undef, ">$fig_config_name");
     # Write the initial lines.
@@ -221,8 +261,28 @@ sub WriteAllParams {
     	"## WHEN YOU ADD ITEMS TO THIS FILE, BE SURE TO UPDATE utils/Configure.pl.",
     	"");
     # Write each parameter.
-    Env::WriteParam($oh, "Temporary directory.", temp => "$dataRootDir/Web/Tmp");
+    Env::WriteParam($oh, "Web root directory.", web_dir => $webRootDir);
+    Env::WriteParam($oh, "Temporary directory.", temp => "$webRootDir/Tmp");
     Env::WriteParam($oh, "URL for temporary directory.", temp_url => 'http://localhost/Tmp');
+    Env::WriteParam($oh, "TRUE for windows mode", win_mode => ($opt->winmode ? 1 : 0));
+    Env::WriteParam($oh, "source project directory", source => $base_dir);
+    ## Put new non-Shrub parameters here.
+    # These next parameters are lists, so we have to build them manually.
+    WriteLines($oh, "", "# private script directory list",
+    		'our @pscripts = qw(' . join(" ", @FIG_Config::pscripts) . ');',
+    		"", "# private PERL library list",
+    		'our @plibs = qw(' . join(" ", @FIG_Config::plibs) . ');');
+    # These next parameters use code, so are not subject to the usual Env::WriteParam logic. 
+    WriteLines($oh, "", "# script directory list",
+    		'our @scripts = map { "$source/$_" } (qw(' . join(" ", SCRIPTS) . ', @pscripts);',
+    		"",  "# PERL library list",
+    		'our @libs = map { "$source/$_" } (qw(' . join(" ", LIBS) . ', @plibs)');
+    # Now comes the Shrub configuration section.
+    WriteLines($oh, "", "", "# SHRUB CONFIGURATION", "");
+    Env::WriteParam($oh, "base directory for database-related files", shrub_dir => "$dataRootDir");
+    Env::WriteParam($oh, "DBD location", shrub_dbd => "$base_dir/ERDB/ShrubDBD.xml");
+    Env::WriteParam($oh, "signon info", userData => "seed/");
+    Env::WriteParam($oh, "database name", shrubDB => "seedtk_shrub");
     Env::WriteParam($oh, "TRUE if we should create indexes before a table load (generally TRUE for MySQL, FALSE for PostGres)",
     		preIndex => 1);
     Env::WriteParam($oh, "default DBMS", dbms => "mysql");
@@ -233,19 +293,6 @@ sub WriteAllParams {
     Env::WriteParam($oh, "TRUE to turn off size estimates during table creation-- these are needed for MyISAM",
     		disable_dbkernel_size_estimates => 1);
     Env::WriteParame($oh, "mode for LOAD TABLE INFILE statements, usually LOCAL", load_mode => 'LOCAL');
-    Env::WriteParam($oh, "TRUE for windows mode", win_mode => ($opt->winmode ? 1 : 0));
-    Env::WriteParam($oh, "source project directory", source => $base_dir);
-    ## Put new non-Shrub parameters here.
-    # This next parameters use code, so are not subject to the usual Env::WriteParam logic. 
-    WriteLines($oh, "", "# script directory list",
-    		'our \@scripts = map { "$source/$_" } qw(' . join(" ", SCRIPTS) . ');', 
-    		'our \@libs = map { "$source/$_" } qw(' . join(" ", LIBS) . ')');
-    # Now comes the Shrub configuration section.
-    WriteLines($oh, "", "# SHRUB CONFIGURATION", "");
-    Env::WriteParam($oh, "base directory for database-related files", shrub_dir => "$dataRootDir/Data");
-    Env::WriteParam($oh, "DBD location", shrub_dbd => "$base_dir/ERDB/ShrubDBD.xml");
-    Env::WriteParam($oh, "signon info", userData => "seed/");
-    Env::WriteParam($oh, "database name", shrubDB => "seedtk_shrub");
     ## Put new Shrub parameters here.
 	# Write the trailer.
 	Env::WriteLines($oh, "", "1;");
@@ -305,6 +352,7 @@ sub WriteAllConfigs {
     # Set the PERL libraries.
     my $libs = join(";", @FIG_Config::libs);
     Env::WriteConfig($oh, "Add SEEDtk libraries to the PERL library path.", PERL5LIB => $libs, merge => ';');
+    ## Put new configuration parameters here.
 }
 
 

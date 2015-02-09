@@ -29,6 +29,8 @@
 This script analyzes relationships in a Shrub database and deletes instances that
 link to entities that do not exist.
 
+=head2 Paraameters
+
 The positional parameters are the relationship names.
 
 The command-line options are those described in L<Shrub/new_for_script> plus the

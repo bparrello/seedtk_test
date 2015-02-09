@@ -31,7 +31,9 @@ use ShrubLoader;
 This script displays in the form of a text file the information needed to
 create load files for the specified Shrub database.
 
-=head2 Command-Line Options
+=head2 Parameters
+
+There are no positional parameters.
 
 The command-line options are those found in L<Shrub/new_for_script> plus
 the following.
