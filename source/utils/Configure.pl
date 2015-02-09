@@ -196,11 +196,9 @@ L</WriteAllConfigs> method.
 		open(my $oh, ">$webConfig") || die "Could not open web configuration file $webConfig: $!\n";
 		# Write the file.
 		print $oh "\n";
-		print $oh "BEGIN {\n";
-		print $oh "    unshift @INC, '$sourcedir/config', '$sourcedir/kernel';\n";
-		print $oh "}\n";
+		print $oh "    use lib '$sourcedir/config', '$sourcedir/kernel';\n";
 		print $oh "\n";
-		print $oh "use FIG_Config;\n";
+		print $oh "    use FIG_Config;\n";
 		print $oh "\n";
 		print $oh "1;\n";
 		# Close the file.

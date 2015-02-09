@@ -18,7 +18,6 @@
 #
 
     use strict;
-    use Tracer;
     use CGI;
 
 =head1 ERDB DBD Display
@@ -46,14 +45,14 @@ my $cgi = CGI->new();
 # Get the parameters.
 my $fileName = $cgi->param('xmlFileName');
 if (! $fileName) {
-    Confess("No DBD specified.");
+    die "No DBD specified.";
 } elsif (! -f $fileName) {
     die "Invalid DBD location $fileName.";
 } else {
     # Start the output.
     print "Content-Type: text/xml\n\n";
     # Open the XML file.
-    my $ih = Open(undef, "<$fileName");
+    open(my $ih, "<$fileName") || die "Could not open $fileName: $!";
     # Echo it to the outut.
     while (! eof $ih) {
         my $line = <$ih>;
@@ -62,4 +61,3 @@ if (! $fileName) {
     # Close the input file.
     close $ih;
 }
-
