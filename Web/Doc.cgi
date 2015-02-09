@@ -48,7 +48,7 @@ eval {
             # Denote we want an index.
             $parser->index(1);
             # Make us the L-link URL.
-            $parser->perldoc_url_prefix("index.cgi?module=");
+            $parser->perldoc_url_prefix("Doc.cgi?module=");
             # Denote that we want to format the Pod into a string.
             my $pod;
             $parser->output_string(\$pod);
@@ -60,7 +60,7 @@ eval {
                 $pod = CGI::h3("No POD documentation found in <u>$modName</u>.");
             }
             # Put the result in the output area.
-            push @lines, CGI::div({ id => 'Dump' }, $pod);
+            push @lines, CGI::div({ id => 'Dump' }, $pod, CGI::br({ class => 'clear' }));
         }
     }
     print join("\n", @lines);
