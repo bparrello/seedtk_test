@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!perl -w
 
 #
 # Copyright (c) 2003-2006 University of Chicago and Fellowship
@@ -260,6 +260,9 @@ L</WriteAllConfigs> method.
 		}
 		# Write the UConfig.
 		WriteAllConfigs($ucFileName, $base_dir, $opt);
+		## TODO: parse the PerlPath.sh to create a "run_perl.sh" file in the web directory.
+		## TODO: update the CGI scripts to shebang to #!./run_perl.sh
+		## TODO: script to set executable marks on CGIs, SHs, and PLs.
 	}
 	# Check for an Apache Vhosts update request.
 	if ($apache) {
