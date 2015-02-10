@@ -354,9 +354,7 @@ sub WriteParam {
     	# Here the value is not a number. Convert it to backslashed form and quote it.
     	my @output = ('"');
     	for my $ch (split //, $value) {
-    		my $tr = BACKSLASH->{$ch};
-    		$tr = $ch if ! defined($tr);
-    		push @output, $tr;
+    		push @output, (BACKSLASH->{$ch} // $ch);
     	}
     	$value = join("", @output, '"');
     }
@@ -444,10 +442,10 @@ sub WriteConfig {
 		# Is this a merge?
 		if ($delim) {
 			# Yes. Write a command to prefix the new information.
-			print $oh "export $varName=$value$delim%$varName%\n";
+			print $oh "export $varName=\"$value$delim\$$varName\"\n";
 		} else {
 			# No. Write a command to store the new information.
-			print $oh "export $varName=$value\n";
+			print $oh "export $varName=\"$value\"\n";
 		}
 	} else {
 		# Here we have a registry update. There is no comment. We'll

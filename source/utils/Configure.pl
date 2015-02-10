@@ -95,7 +95,12 @@ If specified, the default data and web subdirectories will be set up.
 
 If specified, a link named C<SEEDtk> will be placed in this directory that points to the web root
 directory. The specified directory whould be the user's home web directory, and this allows the
-SEEDtk web to be accessed from it. Only Unix systems should use this feature. 
+SEEDtk web to be accessed from it. Only Unix systems should use this feature.
+
+=item pfix
+
+If C<1>, the system requires a PERL path fixup. The contents of C<PerlPath.sh> will be added
+to the B<UConfig> file. This defaults to C<1> for Unix and C<0> for Windows.
 
 =back
 
@@ -130,6 +135,7 @@ L</WriteAllConfigs> method.
 					{ default => "$base_dir/config/UConfig.sh" }],
 			["apache=s", "location of the Apache configuration files for the testing server"],
 			["dirs", "verify default subdirectories exist"],
+			["pfix=i", "perform PERL path fixup", { default => (1 - $winMode) }],
 			["home=s", "location of the home web directory for the current user; if specified, a link will be placed to the web directory"],
 			["links", "generate Links.html file"],
 			);
@@ -149,10 +155,13 @@ L</WriteAllConfigs> method.
 			die "Home directory option not valid for Windows.\n";
 		}
 	}
+	# Check for mutually exclusive options.
 	if ($opt->dirs && $winMode != $opt->winmode) {
 		die "Option --dirs prohibited when targeting cross-platform.";
 	} elsif ($homeDir && $opt->winmode) {
-		die "Option --home prohibited when targeting Windows.\n";
+		die "Option --home prohibited when targeting Windows.";
+	} elsif ($opt->uc eq 'sys' && $opt->pfix) {
+		die "Cannot use PERL fixup (pfix) when doing a registry update.";
 	}
 	print "Analyzing directories.\n";
 	# The root directories will be put in here.
@@ -436,24 +445,38 @@ Command-line options object.
 sub WriteAllConfigs {
     # Get the parameters.
     my ($fileName, $base_dir, $opt) = @_;
+    # This will be the delimiter used for path merging. This is
+    # a colon for Unix, semi-colon for Windows.
+    my $delim = ($opt->winmode ? ';' : ':');
     # This will be the output file handle. We'll set it to the
     # environment cluster if we are writing to the registry.
     my $oh;
-    if ($opt->uc ne 'sys') {
-    	# Here we are writing to a file.
-    	open($oh, ">$fileName") || die "Could not open UConfig file $fileName: $!";
-    	print "Writing environment changes to $fileName.\n";
-    } else {
+    if ($opt->uc eq 'sys') {
     	# Here we are updating the registry.
     	$oh = Env->GetRegKey(HKLM => REGKEY);
     	print "Writing environment changes to registry.\n";
+    } else {
+    	# Here we are writing to a file.
+    	open($oh, ">$fileName") || die "Could not open UConfig file $fileName: $!";
+    	print "Writing environment changes to $fileName.\n";
+	    # Check for a PERL fix requirement.
+	    if ($opt->pfix) {
+	    	# Start with a comment.
+	    	print $oh "# Fix PERL execution path.\n";
+	    	# Get the PERL fix file.
+	    	open(my $ih, "<$base_dir/config/PerlPath.sh") || die "Could not open PerlPath.sh: $!";
+			# Spool it to the environment script.
+			print $oh (<$ih>);
+			# Add a spacer.
+			print $oh "\n";
+	    }
     }
     # Compute the script paths.
-    my $paths = Env::BuildPathList($opt->winmode, ";", @FIG_Config::scripts);
-    Env::WriteConfig($oh, "Add SEEDtk scripts to the execution path.", PATH => $paths, merge => ';', expanded => 1);
+    my $paths = Env::BuildPathList($opt->winmode, $delim, @FIG_Config::scripts);
+    Env::WriteConfig($oh, "Add SEEDtk scripts to the execution path.", PATH => $paths, merge => $delim, expanded => 1);
     # Set the PERL libraries.
-    my $libs = Env::BuildPathList($opt->winmode, ";", @FIG_Config::libs);
-    Env::WriteConfig($oh, "Add SEEDtk libraries to the PERL library path.", PERL5LIB => $libs, merge => ';');
+    my $libs = Env::BuildPathList($opt->winmode, $delim, @FIG_Config::libs);
+    Env::WriteConfig($oh, "Add SEEDtk libraries to the PERL library path.", PERL5LIB => $libs, merge => $delim);
     ## Put new configuration parameters here.
     # The file (or registry key) in $oh will close automatically when we go out of scope.
 }
