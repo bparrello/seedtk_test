@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!./run_perl.sh
 
     use strict;
     use lib 'lib';

@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!./run_perl.sh
 
 #
 # Copyright (c) 2003-2006 University of Chicago and Fellowship

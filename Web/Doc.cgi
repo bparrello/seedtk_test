@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!./run_perl.sh
 
     use strict;
     use CGI;

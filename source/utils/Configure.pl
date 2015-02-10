@@ -226,11 +226,15 @@ L</WriteAllConfigs> method.
 		# Execute it to get the latest variable values.
 		print "Reading back new configuration.\n";
 		RunFigConfig($outputName);
-		# Create the web configuration file. We need the key directories.
-		my $sourcedir = $FIG_Config::source;
-		my $webConfig = "$FIG_Config::web_dir/lib/Web_Config.pm";
-		# Open the web configuration file for output.
-		open(my $oh, ">$webConfig") || die "Could not open web configuration file $webConfig: $!\n";
+	}
+	# Create the web configuration file. We need the key directories.
+	my $sourcedir = $FIG_Config::source;
+	my $webConfig = "$FIG_Config::web_dir/lib/Web_Config.pm";
+	# Open the web configuration file for output.
+	if (! open(my $oh, ">$webConfig")) {
+		# Web system problems are considered warnings, not fatal errors.
+		warn "Could not open web configuration file $webConfig: $!\n";
+	} else {
 		# Write the file.
 		print $oh "\n";
 		print $oh "    use lib '$sourcedir/config', '$sourcedir/kernel';\n";
@@ -241,8 +245,7 @@ L</WriteAllConfigs> method.
 		# Close the file.
 		close $oh;
 		print "Web configuration file $webConfig created.\n";
-	}
-	
+	}	
 	# If the UConfig write has NOT been turned off, then write the UConfig.
 	if ($opt->uc eq 'off') {
 		print "UConfig output suppressed.\n";
@@ -260,9 +263,23 @@ L</WriteAllConfigs> method.
 		}
 		# Write the UConfig.
 		WriteAllConfigs($ucFileName, $base_dir, $opt);
-		## TODO: parse the PerlPath.sh to create a "run_perl.sh" file in the web directory.
-		## TODO: update the CGI scripts to shebang to #!./run_perl.sh
-		## TODO: script to set executable marks on CGIs, SHs, and PLs.
+		# Now we create the run_perl file in the web directory.  First, we
+		# open the file for output.
+		if (! open(my $oh, ">$FIG_Config::web_dir/run_perl.sh")) {
+			# Web configuration problems are considered warnings, not fatal errors.
+			warn "Could not update web run_perl file: $!";
+		} else {
+			# Are we using a PERL fixup?
+			if ($opt->pfix) {
+				# Yes. Copy in the PERL path fixup.
+				CopyPerlFix($oh, $base_dir);
+			}
+			# Put in the command to execute PERL.
+			print $oh "exec perl \"$@\"\n";
+			# Close the output.
+			close $oh;
+		}
+		## TODO: if unix, set executable marks on CGIs, SHs, and PLs.
 	}
 	# Check for an Apache Vhosts update request.
 	if ($apache) {
@@ -464,14 +481,7 @@ sub WriteAllConfigs {
     	print "Writing environment changes to $fileName.\n";
 	    # Check for a PERL fix requirement.
 	    if ($opt->pfix) {
-	    	# Start with a comment.
-	    	print $oh "# Fix PERL execution path.\n";
-	    	# Get the PERL fix file.
-	    	open(my $ih, "<$base_dir/config/PerlPath.sh") || die "Could not open PerlPath.sh: $!";
-			# Spool it to the environment script.
-			print $oh (<$ih>);
-			# Add a spacer.
-			print $oh "\n";
+	    	CopyPerlFix($oh, $base_dir);
 	    }
     }
     # Compute the script paths.
@@ -483,6 +493,41 @@ sub WriteAllConfigs {
     ## Put new configuration parameters here.
     # The file (or registry key) in $oh will close automatically when we go out of scope.
 }
+
+=head3 CopyPerlFix
+
+	CopyPerlFix($oh, $base_dir);
+
+Copy the B<PerlPath.sh> file into the specified output file. This puts a PERL directory correction
+into the path so that the correct PERL version is run.
+
+=over 4
+
+=item oh
+
+Output handle to which the PERL fixup should be written.
+
+=item base_dir
+
+Root directory for the source tree. B<PerlPath.sh> will be in its B<config> subdirectory.
+
+=back
+
+=cut
+ 
+sub CopyPerlFix {
+	# Get the parameters.
+	my ($oh, $base_dir) = @_;
+ 	# Start with a comment.
+   	print $oh "# Fix PERL execution path.\n";
+   	# Get the PERL fix file.
+   	open(my $ih, "<$base_dir/config/PerlPath.sh") || die "Could not open PerlPath.sh: $!";
+	# Spool it to the environment script.
+	print $oh (<$ih>);
+	# Add a spacer.
+	print $oh "\n";
+}
+
 
 =head3 SetupVHosts
 
