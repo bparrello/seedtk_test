@@ -91,6 +91,12 @@ which will be updated to run the SEEDtk development testing server.
 
 If specified, the default data and web subdirectories will be set up.
 
+=item home
+
+If specified, a link named C<SEEDtk> will be placed in this directory that points to the web root
+directory. The specified directory whould be the user's home web directory, and this allows the
+SEEDtk web to be accessed from it. Only Unix systems should use this feature. 
+
 =back
 
 =head2 Notes for Programmers
@@ -124,8 +130,30 @@ L</WriteAllConfigs> method.
 					{ default => "$base_dir/config/UConfig.sh" }],
 			["apache=s", "location of the Apache configuration files for the testing server"],
 			["dirs", "verify default subdirectories exist"],
+			["home=s", "location of the home web directory for the current user; if specified, a link will be placed to the web directory"],
 			["links", "generate Links.html file"],
 			);
+	# Validate the web directory options.
+	my $apache = $opt->apache;
+	my $homeDir = $opt->home;
+	if ($apache) {
+		if (! -f $apache) {
+			die "Apache config file $apache not found."
+		} elsif ($homeDir) {
+			die "Cannot have both the --apache and --home options."
+		}
+	} elsif ($homeDir) {
+		if (! -d $homeDir) {
+			die "Home directory $homeDir not found.";
+		} elsif ($winMode) {
+			die "Home directory option not valid for Windows.\n";
+		}
+	}
+	if ($opt->dirs && $winMode != $opt->winmode) {
+		die "Option --dirs prohibited when targeting cross-platform.";
+	} elsif ($homeDir && $opt->winmode) {
+		die "Option --home prohibited when targeting Windows.\n";
+	}
 	print "Analyzing directories.\n";
 	# The root directories will be put in here.
 	my ($dataRootDir, $webRootDir) = ('', '');
@@ -225,11 +253,14 @@ L</WriteAllConfigs> method.
 		WriteAllConfigs($ucFileName, $base_dir, $opt);
 	}
 	# Check for an Apache Vhosts update request.
-	my $vhosts = $opt->apache;
-	if ($vhosts) {
+	if ($apache) {
 		# Yes. Do the update.
-		print "Updating Apache configuration file $vhosts.\n";
-		SetupVHosts($vhosts, $opt->winmode);
+		print "Updating Apache configuration file $apache.\n";
+		SetupVHosts($apache, $opt->winmode);
+	}
+	# Check for the home directory symlink request.
+	if ($homeDir) {
+		symlink($FIG_Config::web_dir, "$homeDir/SEEDtk");
 	}
 	# Finally, check for the links file.
 	if ($opt->links) {
