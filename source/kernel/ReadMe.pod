@@ -144,7 +144,20 @@ you'll have to type.
 
 	cd SEEDtk
 
+The next step is to create a data directory. You can create your own private data directory or you
+can use an existing one. For this example, we'll create a private one right under SEEDtk and make
+it writable by the FIG group.
 
+	mkdir Data
+	chmod g+ws Data
+	chgrp fig Data
+
+We are now ready to bootstrap the system using the L<Configure.pl> script. Type
+
+	perl source/utils/Configure.pl --dirs --links --home=~self/public_html Data Web
+
+Here C<Data> should be your data directory, and C<~self/public_html> the path to a web-addressable
+directory, usually C<public_html> in your home directory. 
 
 
 

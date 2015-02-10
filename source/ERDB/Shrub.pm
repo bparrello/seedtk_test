@@ -143,7 +143,7 @@ sub new {
     	$options{externalDBD} = 1;
     }
     # Compute the socket. An empty string is a valid override here.
-    my $sock = $options{sock} // "";
+    my $sock = $options{sock} || "";
     # Compute the user name and password.
     my ($user, $pass) = split '/', $userData, 2;
     $pass = "" if ! defined $pass;

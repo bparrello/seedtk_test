@@ -217,11 +217,12 @@ level and all levels below it. The default is C<0>.
 sub ConnectPegFunctions {
 	# Get the parameters.
 	my ($self, $genome, $genomeDir, $gPegHash, %options) = @_;
-	# Determine if we are translating links. Note the use of the // operator: if the value is underfined,
+	# Determine if we are translating links.
 	# it defaults to 1.
-	my $translateLinks = $options{translateLinks} // 1;
+	my $translateLinks = $options{translateLinks};
+	$translateLinks = 1 if ! defined $translateLinks;
 	# Determine the privilege level. The default is 0.
-	my $priv = $options{priv} // 0;
+	my $priv = $options{priv} || 0;
 	# Get the loader object.
 	my $loader = $self->{loader};
 	# Get the statistics object.

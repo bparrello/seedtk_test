@@ -354,7 +354,9 @@ sub WriteParam {
     	# Here the value is not a number. Convert it to backslashed form and quote it.
     	my @output = ('"');
     	for my $ch (split //, $value) {
-    		push @output, (BACKSLASH->{$ch} // $ch);
+    		my $tr = BACKSLASH->{$ch};
+    		$tr = $ch if ! defined($tr);
+    		push @output, $tr;
     	}
     	$value = join("", @output, '"');
     }
