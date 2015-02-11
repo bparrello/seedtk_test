@@ -26,7 +26,7 @@
 
 =head1 Load Subsystems Into the Shrub Database
 
-    ShrubLoadSubsystems [options] subsysDirectory
+    ShrubLoadSubsystems.pl [options] subsysDirectory
 
 This script loads subsystems, related proteins, and their assignments into the Shrub database. The protein assignments
 are taken from subsystems to insure they are of the highest quality. This process is used to prime

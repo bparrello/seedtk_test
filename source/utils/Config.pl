@@ -35,6 +35,8 @@
 
 =head1 Generate SEEDtk Configuration Files
 
+    Config.pl [ options ] dataDirectory webDirectory
+
 This method generates (or re-generates) the L<FIG_Config> and B<UConfig.sh> files for a
 SEEDtk environment.
 
@@ -416,6 +418,7 @@ sub WriteAllParams {
     Env::WriteParam($oh, 'URL for the directory of temporary files', temp_url => 'http://localhost/Tmp');
     Env::WriteParam($oh, 'TRUE for windows mode', win_mode => ($opt->winmode ? 1 : 0));
     Env::WriteParam($oh, 'source code root directory', source => $base_dir);
+    Env::WriteParam($oh, 'BASH prompt string', prompt => '\h-\W');
     ## Put new non-Shrub parameters here.
     # These next parameters are lists, so we have to build them manually.
     Env::WriteLines($oh, "", "# base names of the private script folders",
@@ -519,7 +522,7 @@ sub WriteAllConfigs {
         $rootDir =~ s/\/source$//;
         print $oh "cd $rootDir\n";
         # Fix up the prompt
-        print $oh 'PS1="\h-\W$ "' . "\n";
+        print $oh "PS1=\"$FIG_Config::prompt\$ \"\n";
     }
     # The file (or registry key) in $oh will close automatically when we go out of scope.
 }

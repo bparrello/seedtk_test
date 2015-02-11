@@ -24,7 +24,7 @@ use ShrubLoader;
 
 =head1 Display Shrub Table Load Formats
 
-    ShrubLoadFormat [options]
+    ShrubLoadFormat.pl [options]
 
 =head2 Introduction
 

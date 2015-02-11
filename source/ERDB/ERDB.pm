@@ -1384,6 +1384,81 @@ sub GetAll {
     return @retVal;
 }
 
+=head3 PutAll
+
+    $erdb->PutAll($oh, \@objectNames, $filterClause, \@parameters, \@fields, $count);
+
+Output a list of values taken from the objects returned by a query. The
+output will be in the form of a tab-delimited sequential file. The first
+parameter is the output file handle; the remaining parameters correspond to those
+of the L<>/GetAll> method.
+
+=over 4
+
+=item oh
+
+Open output file handle.
+
+=item objectNames
+
+List containing the names of the entity and relationship objects to be retrieved.
+See L</Object Name List>.
+
+=item filterClause
+
+WHERE/ORDER BY clause (without the WHERE) to be used to filter and sort the query.
+See L</Filter Clause>.
+
+=item parameterList
+
+List of the parameters to be substituted in for the parameters marks
+in the filter clause. See L</Parameter List>.
+
+=item fields
+
+List of the fields to be returned in each element of the list returned, or a
+string containing a space-delimited list of field names. The field names should
+be in L</Standard Field Name Format>.
+
+=item count
+
+Maximum number of records to return. If omitted or 0, all available records will
+be returned.
+
+=back
+
+=cut
+
+sub PutAll {
+    # Get the parameters.
+    my ($self, $oh, $objectNames, $filterClause, $parameterList, $fields, $count) = @_;
+    # Translate the parameters from a list reference to a list. If the parameter
+    # list is a scalar we convert it into a singleton list.
+    my @parmList = ();
+    if (ref $parameterList eq "ARRAY") {
+        Trace("GetAll parm list is an array.") if T(4);
+        @parmList = @{$parameterList};
+    } else {
+        Trace("GetAll parm list is a scalar: $parameterList.") if T(4);
+        push @parmList, $parameterList;
+    }
+    # Add the row limit to the filter clause.
+    if (defined $count && $count > 0) {
+        $filterClause .= " LIMIT $count";
+    }
+    # Create the query.
+    my $query = $self->Get($objectNames, $filterClause, \@parmList);
+    # Convert the field names to a list if they came in as a string.
+    my $fieldList = (ref $fields ? $fields : [split /\s+/, $fields]);
+    # Loop through the records returned, writing the fields. Note that if the
+    # counter is non-zero, we stop when the number of records read hits the count.
+    while (my $row = $query->Fetch()) {
+        my @rowData = $row->Values($fieldList);
+        print $oh join("\t", @rowData) . "\n";
+    }
+}
+
+
 =head3 Exists
 
     my $found = $erdb->Exists($entityName, $entityID);

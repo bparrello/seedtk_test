@@ -129,12 +129,12 @@ Display the configuration variables and their values.
 First, you need a user name and password on GITHUB, and it must be an authorized contributor to the C<seedtk_test>
 repository.
 
-Position in your home directory. In the examples below, it will be assumed your user name is C<username>. Simply
-substitute your real username when typing the commands.
+Position in your home directory with the B<bash> shell active. In the examples below, it will be assumed your user
+name is C<self>. Simply substitute your real username when typing the commands.
 
 Clone the repository using GIT.
 
-    git clone https://username@github.com/bparrello/seedtk_test.git SEEDtk
+    git clone https://self@github.com/bparrello/seedtk_test.git SEEDtk
 
 You will be prompted for a password. A new directory C<SEEDtk> will be created at the current
 location and the SEEDtk files will be loaded into it.
@@ -163,12 +163,16 @@ We are now ready to bootstrap the system using the L<Config.pl> script. Type
 Here C<Data> should be your data directory, and C</homes/self/public_html> the path to a web-addressable
 directory, usually C<public_html> in your home directory.
 
+Now exit from bash. From this point on, to get yourself into a SEEDtk environment, you
+
 The L<Config.pl> script is one you will use frequently to insure your environment is up-to-date,
 but once the environment is active you will not need to type so many options. Most of the time
 you'll just enter
 
-    Config
+    Config.pl
 
 directly and everything will be fixed up automatically. You will not need to do this every time you
 change the code, only when you add a new script, update L<FIG_Config>, or an environment change is
 made to the system as a whole.
+
+

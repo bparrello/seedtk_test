@@ -19,7 +19,7 @@
 
 =head1 Load Genomes Into the Shrub Database
 
-    ShrubLoadGenomes [options] genome1 genome2 ...
+    ShrubLoadGenomes.pl [options] genome1 genome2 ...
 
 This method loads one or more genomes from repository directories into the
 Shrub database. The genome data will be assembled into load files for
