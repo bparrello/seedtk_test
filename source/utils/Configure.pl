@@ -132,7 +132,7 @@ L</WriteAllConfigs> method.
 			["fc=s", "name of a file to use for the FIG_Config output, or \"off\" to turn off FIG_Config output",
 					{ default => "$base_dir/config/FIG_Config.pm" }],
 			["uc=s", "name of a file to use for the UConfig output, \"off\" to turn off UConfig output, or \"sys\" to write directly to the environment",
-					{ default => "$base_dir/config/UConfig.sh" }],
+					{ default => "$base_dir/UConfig.sh" }],
 			["apache=s", "location of the Apache configuration files for the testing server"],
 			["dirs", "verify default subdirectories exist"],
 			["pfix=i", "perform PERL path fixup", { default => (1 - $winMode) }],
@@ -258,9 +258,9 @@ L</WriteAllConfigs> method.
 		if ($ucFileName ne 'sys') {
 			# Fix the slash craziness for Windows.
 			$ucFileName =~ tr/\\/\//;
-			# If the name is pathless, put it in the config directory.
+			# If the name is pathless, put it in the source directory.
 			if ($ucFileName !~ /\//) {
-				$ucFileName = "$base_dir/config/$ucFileName";
+				$ucFileName = "$base_dir/$ucFileName";
 			}
 		}
 		# Write the UConfig.
