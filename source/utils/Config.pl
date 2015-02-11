@@ -512,6 +512,10 @@ sub WriteAllConfigs {
     my $libs = Env::BuildPathList($opt->winmode, $delim, @FIG_Config::libs);
     Env::WriteConfig($oh, "Add SEEDtk libraries to the PERL library path.", PERL5LIB => $libs, merge => $delim);
     ## Put new configuration parameters here.
+    # Change to the SEEDtk directory.
+    my $rootDir = $base_dir;
+    $rootDir =~ s/\/source$//;
+    print $oh "cd $rootDir";
     # The file (or registry key) in $oh will close automatically when we go out of scope.
 }
 

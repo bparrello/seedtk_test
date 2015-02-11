@@ -442,10 +442,12 @@ sub WriteConfig {
 		# Is this a merge?
 		if ($delim) {
 			# Yes. Write a command to prefix the new information.
-			print $oh "export $varName=\"$value$delim\$$varName\"\n";
+			print $oh "$varName=\"$value$delim\$$varName\"\n";
+			print $oh "export $varName\n";
 		} else {
 			# No. Write a command to store the new information.
-			print $oh "export $varName=\"$value\"\n";
+			print $oh "$varName=\"$value\"\n";
+			print $oh "export $varName\n";
 		}
 	} else {
 		# Here we have a registry update. There is no comment. We'll

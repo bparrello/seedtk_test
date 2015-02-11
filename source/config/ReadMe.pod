@@ -154,12 +154,26 @@ it writable by the FIG group.
 
 Now we need to get access to the correct version of PERL. To do this, you type
 
-We are now ready to bootstrap the system using the L<Configure.pl> script. Type
+	source source/config/PerlPath.sh
 
-	perl source/utils/Configure.pl --dirs --links --home=~self/public_html Data Web
+We are now ready to bootstrap the system using the L<Config.pl> script. Type
+
+	perl source/utils/Config.pl --dirs --links --home=~self/public_html Data Web
 
 Here C<Data> should be your data directory, and C<~self/public_html> the path to a web-addressable
-directory, usually C<public_html> in your home directory. 
+directory, usually C<public_html> in your home directory.
+
+The L<Config.pl> script is one you will use frequently to insure your environment is up-to-date,
+but once the environment is active you will not need to type so many options. Most of the time
+you'll just enter
+
+	Config
+
+directly and everything will be fixed up automatically. You will not need to do this every time you
+change the code, only when you add a new script, update L<FIG_Config>, or an environment change is
+made to the system as a whole.
+
+
 
 
 
