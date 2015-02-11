@@ -279,7 +279,17 @@ L</WriteAllConfigs> method.
 			# Close the output.
 			close $oh;
 		}
-		## TODO: if unix, set executable marks on CGIs, SHs, and PLs.
+		if (! $winMode && ! $opt->winmode) {
+			# Here we are on a Unix system and not targeting Windows, so we need to
+			# fix the execution permissions of all the script files.
+			print "Fixing execution permissions.\n";
+			# Fix the web directory permissions.
+			FixPermissions($FIG_Config::web_dir, ".cgi");
+			# Fix the permissions of the script directories.
+			for my $scriptDir (@FIG_Config::scripts) {
+				FixPermissions($scriptDir, ".pl");
+			}
+		}
 	}
 	# Check for an Apache Vhosts update request.
 	if ($apache) {
