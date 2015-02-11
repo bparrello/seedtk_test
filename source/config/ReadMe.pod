@@ -152,6 +152,8 @@ it writable by the FIG group.
 	chmod g+ws Data
 	chgrp fig Data
 
+Now we need to get access to the correct version of PERL. To do this, you type
+
 We are now ready to bootstrap the system using the L<Configure.pl> script. Type
 
 	perl source/utils/Configure.pl --dirs --links --home=~self/public_html Data Web

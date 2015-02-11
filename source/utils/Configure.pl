@@ -22,7 +22,6 @@
     use File::Spec;
     use File::Copy;
     use File::Path;
-    use File::Stat;
     use Getopt::Long::Descriptive;
 
 	# We don't have access to the normal SEEDtk libraries because
@@ -741,7 +740,7 @@ sub FixPermissions {
     	my $fileName = "$directory/$file";
     	# Compute the new mode.
     	my $finfo = stat $fileName;
-    	my $newMode = ($finfo->mode & 0777) | $mask;
+    	my $newMode = ($finfo->[2] & 0777) | $mask;
     	# Update the file.
     	chmod $newMode, $fileName;
     }
