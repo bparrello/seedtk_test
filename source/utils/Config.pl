@@ -176,7 +176,7 @@ L</WriteAllConfigs> method.
     # Make sure we have the data directory if there is no data root
     # in the command-line parameters.
     if (! defined $FIG_Config::shrub_dir) {
-        $dataRootDir = $ARGV[0];
+        $dataRootDir = FixPath($ARGV[0]);
         if (! defined $dataRootDir) {
             die "A data root directory is required if no current value exists in FIG_Config.";
         } elsif (! -d $dataRootDir) {
@@ -191,7 +191,7 @@ L</WriteAllConfigs> method.
     # Make sure we have the web directory if there is no web root in
     # the command-line parameters.
     if (! defined $FIG_Config::web_dir) {
-        $webRootDir = $ARGV[1];
+        $webRootDir = FixPath($ARGV[1]);
         if (! defined $webRootDir) {
             die "A web root directory is required if no current value exists in FIG_Config.";
         } elsif (! -d $webRootDir) {
@@ -748,4 +748,36 @@ sub FixPermissions {
     }
 }
 
+=head3 FixPath
 
+    my $absPath = FixPath($path);
+
+Convert a path from relative to absolute, convert backslashes to slashes, and remove the drive letter.
+This makes the path suitable for passing around in PERL.
+
+=over 4
+
+=item path
+
+Path to convert.
+
+=item RETURN
+
+Returna an absolute, canonical version of the path.
+
+=back
+
+=cut
+
+sub FixPath {
+    # Get the parameters.
+    my ($path) = @_;
+    # Convert the path to a canonical absolute.
+    my $retVal = File::Spec->rel2abs($path);
+    # Convert backslashes to slashes.
+    $retVal =~ tr/\\/\//;
+    # Remove the drive letter (if any).
+    $retVal =~ s/^\w://;
+    # Return the result.
+    return $retVal;
+}
