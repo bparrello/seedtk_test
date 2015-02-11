@@ -259,7 +259,7 @@ L</WriteAllConfigs> method.
             # If the name is pathless, put it in the source directory's parent.
             if ($ucFileName !~ /\//) {
                 my $ucDir = $base_dir;
-                $ucDir =~ s/\/w+$//;
+                $ucDir =~ s/\/\w+$//;
                 $ucFileName = "$ucDir/$ucFileName";
             }
         }
