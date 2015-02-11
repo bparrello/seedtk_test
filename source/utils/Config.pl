@@ -17,6 +17,7 @@
 # http://www.theseed.org/LICENSE.TXT.
 #
 
+
     use strict;
     use File::Basename;
     use File::Spec;
@@ -24,19 +25,19 @@
     use File::Path;
     use Getopt::Long::Descriptive;
 
-	# We don't have access to the normal SEEDtk libraries because
-	# we are still bootstrapping, so we have to pull in the
-	# kernel libraries explicitly.    
+    # We don't have access to the normal SEEDtk libraries because
+    # we are still bootstrapping, so we have to pull in the
+    # kernel libraries explicitly.
     use lib '../kernel';
     use Env;
 
-	# We need to look inside the FIG_Config even though it is loaded at
-	# run-time, so we will get lots of warnings about one-time variables.
-	no warnings qw(once);
-	
-	## THESE TWO CONSTANTS DEFINE THE PUBLIC SCRIPT and PM LIBRARIES.
-	use constant SCRIPTS => qw(utils);
-	use constant LIBS => qw(config ERDB kernel);
+    # We need to look inside the FIG_Config even though it is loaded at
+    # run-time, so we will get lots of warnings about one-time variables.
+    no warnings qw(once);
+
+    ## THESE TWO CONSTANTS DEFINE THE PUBLIC SCRIPT and PM LIBRARIES.
+    use constant SCRIPTS => qw(utils);
+    use constant LIBS => qw(config ERDB kernel);
 
 =head1 Generate SEEDtk Configuration Files
 
@@ -46,8 +47,8 @@ SEEDtk environment.
 =head2 Parameters
 
 The positional parameters are the location of the data folder and the location
-of the web folder (see L<ReadMe> for more information about SEEDtk folders). If a 
-B<FIG_Config> file already exists, this information is not needed-- the existing values 
+of the web folder (see L<ReadMe> for more information about SEEDtk folders). If a
+B<FIG_Config> file already exists, this information is not needed-- the existing values
 will be used.
 
 The command-line options are as follows.
@@ -56,7 +57,7 @@ The command-line options are as follows.
 
 =item fc
 
-If specified, the name of the B<FIG_Config> file for the output. If the name is specified 
+If specified, the name of the B<FIG_Config> file for the output. If the name is specified
 without a path, it will be put in the main C<config> folder. If C<off>, no B<FIG_Config>
 file will be written.
 
@@ -115,224 +116,224 @@ L</WriteAllConfigs> method.
 
 =cut
 
-	$| = 1; # Prevent buffering on STDOUT.
-	print "Retrieving current configuration.\n";
-	# Get the directory this script is running it.
-	my $base_dir = dirname(File::Spec->rel2abs(__FILE__));
-	# Fix Windows slash craziness.
-	$base_dir =~ tr/\\/\//;
-	# Chop off the folder name to get the source root.
-	$base_dir =~ s/\/\w+$//;
-	# Determine the operating system.
-	my $winMode = ($^O =~ /Win/ ? 1 : 0);
-	# Analyze the command line.
-	my ($opt, $usage) = describe_options('%o %c dataRootDirectory webRootDirectory',
-			["winmode|w=i", "\"1\" for Windows, \"0\" for Unix", { default => $winMode }],
-			["clear|c", "ignore current configuration values"],
-			["fc=s", "name of a file to use for the FIG_Config output, or \"off\" to turn off FIG_Config output",
-					{ default => "$base_dir/config/FIG_Config.pm" }],
-			["uc=s", "name of a file to use for the UConfig output, \"off\" to turn off UConfig output, or \"sys\" to write directly to the environment",
-					{ default => "$base_dir/UConfig.sh" }],
-			["apache=s", "location of the Apache configuration files for the testing server"],
-			["dirs", "verify default subdirectories exist"],
-			["pfix=i", "perform PERL path fixup", { default => (1 - $winMode) }],
-			["home=s", "location of the home web directory for the current user; if specified, a link will be placed to the web directory"],
-			["links", "generate Links.html file"],
-			);
-	# Validate the web directory options.
-	my $apache = $opt->apache;
-	my $homeDir = $opt->home;
-	if ($apache) {
-		if (! -f $apache) {
-			die "Apache config file $apache not found."
-		} elsif ($homeDir) {
-			die "Cannot have both the --apache and --home options."
-		}
-	} elsif ($homeDir) {
-		if (! -d $homeDir) {
-			die "Home directory $homeDir not found.";
-		} elsif ($winMode) {
-			die "Home directory option not valid for Windows.\n";
-		}
-	}
-	# Check for mutually exclusive options.
-	if ($opt->dirs && $winMode != $opt->winmode) {
-		die "Option --dirs prohibited when targeting cross-platform.";
-	} elsif ($homeDir && $opt->winmode) {
-		die "Option --home prohibited when targeting Windows.";
-	} elsif ($opt->uc eq 'sys' && $opt->pfix) {
-		die "Cannot use PERL fixup (pfix) when doing a registry update.";
-	}
-	print "Analyzing directories.\n";
-	# The root directories will be put in here.
-	my ($dataRootDir, $webRootDir) = ('', '');
-	# Get the name of the real FIG_Config file (not the output file,
-	# if one was specified, the real one).
-	my $fig_config_name = "$base_dir/config/FIG_Config.pm";
-	# Now we want to get the current environment. If the CLEAR option is
-	# specified or there is no file present, we stay blank; otherwise, we 
-	# load the existing FIG_Config.
-	if (! $opt->clear && -f $fig_config_name) {
-		RunFigConfig($fig_config_name);
-	}
-	# Make sure we have the data directory if there is no data root
-	# in the command-line parameters.
-	if (! defined $FIG_Config::shrub_dir) {
-		$dataRootDir = $ARGV[0];
-		if (! defined $dataRootDir) {
-			die "A data root directory is required if no current value exists in FIG_Config.";
-		} elsif (! -d $dataRootDir) {
-			die "The specified data root directory $dataRootDir was not found.";
-		}
-		# Are we setting up default data directories?
-		if ($opt->dirs) {
-			# Yes. Insure we have the data paths.
-			BuildPaths($opt->winmode, Data => $dataRootDir, qw(Inputs Inputs/GenomeData Inputs/SubSystemData DnaRepo LoadFiles));
-		}
-	}
-	# Make sure we have the web directory if there is no web root in
-	# the command-line parameters.
-	if (! defined $FIG_Config::web_dir) {
-		$webRootDir = $ARGV[1];
-		if (! defined $webRootDir) {
-			die "A web root directory is required if no current value exists in FIG_Config.";
-		} elsif (! -d $webRootDir) {
-			die "The specified web root directory $webRootDir was not found.";
-		}
-		# Are we setting up default web directories?
-		if ($opt->dirs) {
-			# Yes. Insure we have the web paths.
-			BuildPaths($opt->winmode, Web => $webRootDir, qw(img Tmp logs));
-		}
-	}
-	#If the FIG_Config write has NOT been turned off, then write the FIG_Config.
-	if ($opt->fc eq 'off') {
-		print "FIG_Config output suppressed.\n";
-	} else {
-		# Compute the FIG_Config file name.
-		my $outputName = $opt->fc;
-		# Fix the slash craziness for Windows.
-		$outputName =~ tr/\\/\//;
-		# If the name is pathless, put it in the config directory.
-		if ($outputName !~ /\//) {
-			$outputName = "$base_dir/config/$outputName";
-		}
-		# If we are overwriting the real FIG_Config, back it up.
-		if ($outputName eq $fig_config_name) {
-			copy $fig_config_name, "$base_dir/config/FIG_Config_old.pm";
-		}
-		# Write the FIG_Config.
-		print "Writing configuration to $outputName.\n";
-		WriteAllParams($outputName, $base_dir, $dataRootDir, $webRootDir, $opt);
-		# Execute it to get the latest variable values.
-		print "Reading back new configuration.\n";
-		RunFigConfig($outputName);
-	}
-	# Create the web configuration file. We need the key directories.
-	my $sourcedir = $FIG_Config::source;
-	my $webConfig = "$FIG_Config::web_dir/lib/Web_Config.pm";
-	# Open the web configuration file for output.
-	if (! open(my $oh, ">$webConfig")) {
-		# Web system problems are considered warnings, not fatal errors.
-		warn "Could not open web configuration file $webConfig: $!\n";
-	} else {
-		# Write the file.
-		print $oh "\n";
-		print $oh "    use lib\n";
-		print $oh "        '" .	join("',\n        '", @FIG_Config::libs) . "';\n";
-		print $oh "\n";
-		print $oh "    use FIG_Config;\n";
-		print $oh "\n";
-		print $oh "1;\n";
-		# Close the file.
-		close $oh;
-		print "Web configuration file $webConfig created.\n";
-	}	
-	# If the UConfig write has NOT been turned off, then write the UConfig.
-	if ($opt->uc eq 'off') {
-		print "UConfig output suppressed.\n";
-	} else {
-		# Compute the output file name.
-		my $ucFileName = $opt->uc;
-		# If it is not a special name, we need to normalize it.
-		if ($ucFileName ne 'sys') {
-			# Fix the slash craziness for Windows.
-			$ucFileName =~ tr/\\/\//;
-			# If the name is pathless, put it in the source directory.
-			if ($ucFileName !~ /\//) {
-				$ucFileName = "$base_dir/$ucFileName";
-			}
-		}
-		# Write the UConfig.
-		WriteAllConfigs($ucFileName, $base_dir, $opt);
-		print "UConfig file $ucFileName updated.\n";
-		# Now we create the run_perl file in the web directory.  First, we
-		# open the file for output.
-		if (! open(my $oh, ">$FIG_Config::web_dir/run_perl.sh")) {
-			# Web configuration problems are considered warnings, not fatal errors.
-			warn "Could not update web run_perl file: $!";
-		} else {
-			# Are we using a PERL fixup?
-			if ($opt->pfix) {
-				# Yes. Copy in the PERL path fixup.
-				CopyPerlFix($oh, $base_dir);
-			}
-			# Put in the command to execute PERL.
-			print $oh "exec perl \"$@\"\n";
-			# Close the output.
-			close $oh;
-			print "Execution helper run_perl.sh created.\n";
-		}
-		if (! $winMode && ! $opt->winmode) {
-			# Here we are on a Unix system and not targeting Windows, so we need to
-			# fix the execution permissions of all the script files.
-			print "Fixing execution permissions.\n";
-			# Fix the web directory permissions.
-			FixPermissions($FIG_Config::web_dir, ".cgi", 0111);
-			# Fix the permissions of the script directories.
-			for my $scriptDir (@FIG_Config::scripts) {
-				FixPermissions($scriptDir, ".pl", 0111);
-			}
-		}
-	}
-	# Check for an Apache Vhosts update request.
-	if ($apache) {
-		# Yes. Do the update.
-		print "Updating Apache configuration file $apache.\n";
-		SetupVHosts($apache, $opt->winmode);
-	}
-	# Check for the home directory symlink request.
-	if ($homeDir) {
-		my $linkDir = "$homeDir/SEEDtk";
-		if (-d $linkDir) {
-			print "Symbolic link directory $linkDir already exists.\n";
-		} else {
-			symlink($FIG_Config::web_dir, "$homeDir/SEEDtk");
-			print "Symbolic link at $homeDir created for web hosting.\n";
-		}
-	}
-	# Finally, check for the links file.
-	if ($opt->links) {
-		# Determine the output location for the links file.
-		my $linksDest = "$FIG_Config::web_dir/Links.html";
-		# Do we need to generate a links file?
-		if (-f $linksDest) {
-			# No need. We already have one.
-			print "$linksDest file already exists-- not updated.\n";
-		} else {
-			# We don't have a links file yet.
-			print "Generating new $linksDest.\n";
-			# Find the source copy of the file.
-			my $linksSrc = "$base_dir/utils/Links.html";
-			# Copy it to the destination.
-			copy $linksSrc, $linksDest;
-			print "$linksDest file created.\n";
-		}
-	}
-	print "All done.\n";
-	
+    $| = 1; # Prevent buffering on STDOUT.
+    print "Retrieving current configuration.\n";
+    # Get the directory this script is running it.
+    my $base_dir = dirname(File::Spec->rel2abs(__FILE__));
+    # Fix Windows slash craziness.
+    $base_dir =~ tr/\\/\//;
+    # Chop off the folder name to get the source root.
+    $base_dir =~ s/\/\w+$//;
+    # Determine the operating system.
+    my $winMode = ($^O =~ /Win/ ? 1 : 0);
+    # Analyze the command line.
+    my ($opt, $usage) = describe_options('%o %c dataRootDirectory webRootDirectory',
+            ["winmode|w=i", "\"1\" for Windows, \"0\" for Unix", { default => $winMode }],
+            ["clear|c", "ignore current configuration values"],
+            ["fc=s", "name of a file to use for the FIG_Config output, or \"off\" to turn off FIG_Config output",
+                    { default => "$base_dir/config/FIG_Config.pm" }],
+            ["uc=s", "name of a file to use for the UConfig output, \"off\" to turn off UConfig output, or \"sys\" to write directly to the environment",
+                    { default => "$base_dir/UConfig.sh" }],
+            ["apache=s", "location of the Apache configuration files for the testing server"],
+            ["dirs", "verify default subdirectories exist"],
+            ["pfix=i", "perform PERL path fixup", { default => (1 - $winMode) }],
+            ["home=s", "location of the home web directory for the current user; if specified, a link will be placed to the web directory"],
+            ["links", "generate Links.html file"],
+            );
+    # Validate the web directory options.
+    my $apache = $opt->apache;
+    my $homeDir = $opt->home;
+    if ($apache) {
+        if (! -f $apache) {
+            die "Apache config file $apache not found."
+        } elsif ($homeDir) {
+            die "Cannot have both the --apache and --home options."
+        }
+    } elsif ($homeDir) {
+        if (! -d $homeDir) {
+            die "Home directory $homeDir not found.";
+        } elsif ($winMode) {
+            die "Home directory option not valid for Windows.\n";
+        }
+    }
+    # Check for mutually exclusive options.
+    if ($opt->dirs && $winMode != $opt->winmode) {
+        die "Option --dirs prohibited when targeting cross-platform.";
+    } elsif ($homeDir && $opt->winmode) {
+        die "Option --home prohibited when targeting Windows.";
+    } elsif ($opt->uc eq 'sys' && $opt->pfix) {
+        die "Cannot use PERL fixup (pfix) when doing a registry update.";
+    }
+    print "Analyzing directories.\n";
+    # The root directories will be put in here.
+    my ($dataRootDir, $webRootDir) = ('', '');
+    # Get the name of the real FIG_Config file (not the output file,
+    # if one was specified, the real one).
+    my $fig_config_name = "$base_dir/config/FIG_Config.pm";
+    # Now we want to get the current environment. If the CLEAR option is
+    # specified or there is no file present, we stay blank; otherwise, we
+    # load the existing FIG_Config.
+    if (! $opt->clear && -f $fig_config_name) {
+        RunFigConfig($fig_config_name);
+    }
+    # Make sure we have the data directory if there is no data root
+    # in the command-line parameters.
+    if (! defined $FIG_Config::shrub_dir) {
+        $dataRootDir = $ARGV[0];
+        if (! defined $dataRootDir) {
+            die "A data root directory is required if no current value exists in FIG_Config.";
+        } elsif (! -d $dataRootDir) {
+            die "The specified data root directory $dataRootDir was not found.";
+        }
+        # Are we setting up default data directories?
+        if ($opt->dirs) {
+            # Yes. Insure we have the data paths.
+            BuildPaths($opt->winmode, Data => $dataRootDir, qw(Inputs Inputs/GenomeData Inputs/SubSystemData DnaRepo LoadFiles));
+        }
+    }
+    # Make sure we have the web directory if there is no web root in
+    # the command-line parameters.
+    if (! defined $FIG_Config::web_dir) {
+        $webRootDir = $ARGV[1];
+        if (! defined $webRootDir) {
+            die "A web root directory is required if no current value exists in FIG_Config.";
+        } elsif (! -d $webRootDir) {
+            die "The specified web root directory $webRootDir was not found.";
+        }
+        # Are we setting up default web directories?
+        if ($opt->dirs) {
+            # Yes. Insure we have the web paths.
+            BuildPaths($opt->winmode, Web => $webRootDir, qw(img Tmp logs));
+        }
+    }
+    #If the FIG_Config write has NOT been turned off, then write the FIG_Config.
+    if ($opt->fc eq 'off') {
+        print "FIG_Config output suppressed.\n";
+    } else {
+        # Compute the FIG_Config file name.
+        my $outputName = $opt->fc;
+        # Fix the slash craziness for Windows.
+        $outputName =~ tr/\\/\//;
+        # If the name is pathless, put it in the config directory.
+        if ($outputName !~ /\//) {
+            $outputName = "$base_dir/config/$outputName";
+        }
+        # If we are overwriting the real FIG_Config, back it up.
+        if ($outputName eq $fig_config_name) {
+            copy $fig_config_name, "$base_dir/config/FIG_Config_old.pm";
+        }
+        # Write the FIG_Config.
+        print "Writing configuration to $outputName.\n";
+        WriteAllParams($outputName, $base_dir, $dataRootDir, $webRootDir, $opt);
+        # Execute it to get the latest variable values.
+        print "Reading back new configuration.\n";
+        RunFigConfig($outputName);
+    }
+    # Create the web configuration file. We need the key directories.
+    my $sourcedir = $FIG_Config::source;
+    my $webConfig = "$FIG_Config::web_dir/lib/Web_Config.pm";
+    # Open the web configuration file for output.
+    if (! open(my $oh, ">$webConfig")) {
+        # Web system problems are considered warnings, not fatal errors.
+        warn "Could not open web configuration file $webConfig: $!\n";
+    } else {
+        # Write the file.
+        print $oh "\n";
+        print $oh "    use lib\n";
+        print $oh "        '" .	join("',\n        '", @FIG_Config::libs) . "';\n";
+        print $oh "\n";
+        print $oh "    use FIG_Config;\n";
+        print $oh "\n";
+        print $oh "1;\n";
+        # Close the file.
+        close $oh;
+        print "Web configuration file $webConfig created.\n";
+    }
+    # If the UConfig write has NOT been turned off, then write the UConfig.
+    if ($opt->uc eq 'off') {
+        print "UConfig output suppressed.\n";
+    } else {
+        # Compute the output file name.
+        my $ucFileName = $opt->uc;
+        # If it is not a special name, we need to normalize it.
+        if ($ucFileName ne 'sys') {
+            # Fix the slash craziness for Windows.
+            $ucFileName =~ tr/\\/\//;
+            # If the name is pathless, put it in the source directory.
+            if ($ucFileName !~ /\//) {
+                $ucFileName = "$base_dir/$ucFileName";
+            }
+        }
+        # Write the UConfig.
+        WriteAllConfigs($ucFileName, $base_dir, $opt);
+        print "UConfig file $ucFileName updated.\n";
+        # Now we create the run_perl file in the web directory.  First, we
+        # open the file for output.
+        if (! open(my $oh, ">$FIG_Config::web_dir/run_perl.sh")) {
+            # Web configuration problems are considered warnings, not fatal errors.
+            warn "Could not update web run_perl file: $!";
+        } else {
+            # Are we using a PERL fixup?
+            if ($opt->pfix) {
+                # Yes. Copy in the PERL path fixup.
+                CopyPerlFix($oh, $base_dir);
+            }
+            # Put in the command to execute PERL.
+            print $oh "exec perl \"$@\"\n";
+            # Close the output.
+            close $oh;
+            print "Execution helper run_perl.sh created.\n";
+        }
+        if (! $winMode && ! $opt->winmode) {
+            # Here we are on a Unix system and not targeting Windows, so we need to
+            # fix the execution permissions of all the script files.
+            print "Fixing execution permissions.\n";
+            # Fix the web directory permissions.
+            FixPermissions($FIG_Config::web_dir, ".cgi", 0111);
+            # Fix the permissions of the script directories.
+            for my $scriptDir (@FIG_Config::scripts) {
+                FixPermissions($scriptDir, ".pl", 0111);
+            }
+        }
+    }
+    # Check for an Apache Vhosts update request.
+    if ($apache) {
+        # Yes. Do the update.
+        print "Updating Apache configuration file $apache.\n";
+        SetupVHosts($apache, $opt->winmode);
+    }
+    # Check for the home directory symlink request.
+    if ($homeDir) {
+        my $linkDir = "$homeDir/SEEDtk";
+        if (-d $linkDir) {
+            print "Symbolic link directory $linkDir already exists.\n";
+        } else {
+            symlink($FIG_Config::web_dir, "$homeDir/SEEDtk");
+            print "Symbolic link at $homeDir created for web hosting.\n";
+        }
+    }
+    # Finally, check for the links file.
+    if ($opt->links) {
+        # Determine the output location for the links file.
+        my $linksDest = "$FIG_Config::web_dir/Links.html";
+        # Do we need to generate a links file?
+        if (-f $linksDest) {
+            # No need. We already have one.
+            print "$linksDest file already exists-- not updated.\n";
+        } else {
+            # We don't have a links file yet.
+            print "Generating new $linksDest.\n";
+            # Find the source copy of the file.
+            my $linksSrc = "$base_dir/utils/Links.html";
+            # Copy it to the destination.
+            copy $linksSrc, $linksDest;
+            print "$linksDest file created.\n";
+        }
+    }
+    print "All done.\n";
+
 =head2 Internal Subroutines
-		
+
 =head3 RunFigConfig
 
     RunFigConfig($fileName);
@@ -352,17 +353,17 @@ The name of the B<FIG_Config> file to load.
 =cut
 
 sub RunFigConfig {
-	# Get the parameters.
-	my ($fileName) = @_;
-	# Execute the FIG_Config;
-	do $fileName;
-	if ($@) {
-		# An error occurred compiling the module.
-		die "Error compiling FIG_Config: $@";
-	} elsif ($!) {
-		# An error occurred reading the module.
-		die "Error reading FIG_Config: $!";
-	}
+    # Get the parameters.
+    my ($fileName) = @_;
+    # Execute the FIG_Config;
+    do $fileName;
+    if ($@) {
+        # An error occurred compiling the module.
+        die "Error compiling FIG_Config: $@";
+    } elsif ($!) {
+        # An error occurred reading the module.
+        die "Error reading FIG_Config: $!";
+    }
 }
 
 =head3 WriteAllParams
@@ -406,10 +407,10 @@ sub WriteAllParams {
     # Write the initial lines.
     print $oh "package FIG_Config;\n";
     Env::WriteLines($oh,
-    	"",
-    	"## WHEN YOU ADD ITEMS TO THIS FILE, BE SURE TO UPDATE utils/Configure.pl.",
-    	"## All paths should be absolute, not relative.",
-    	"");
+        "",
+        "## WHEN YOU ADD ITEMS TO THIS FILE, BE SURE TO UPDATE utils/Configure.pl.",
+        "## All paths should be absolute, not relative.",
+        "");
     # Write each parameter.
     Env::WriteParam($oh, 'root directory of the local web server', web_dir => $webRootDir);
     Env::WriteParam($oh, 'directory for temporary files', temp => "$webRootDir/Tmp");
@@ -419,37 +420,37 @@ sub WriteAllParams {
     ## Put new non-Shrub parameters here.
     # These next parameters are lists, so we have to build them manually.
     Env::WriteLines($oh, "", "# base names of the private script folders",
-    		'our @pscripts = qw(' . join(" ", @FIG_Config::pscripts) . ');',
-    		"", "# base names of the private PERL library folders",
-    		'our @plibs = qw(' . join(" ", @FIG_Config::plibs) . ');');
-    # These next parameters use code, so are not subject to the usual Env::WriteParam logic. 
+            'our @pscripts = qw(' . join(" ", @FIG_Config::pscripts) . ');',
+            "", "# base names of the private PERL library folders",
+            'our @plibs = qw(' . join(" ", @FIG_Config::plibs) . ');');
+    # These next parameters use code, so are not subject to the usual Env::WriteParam logic.
     Env::WriteLines($oh, "", "# list of script directories",
-    		'our @scripts = map { "$source/$_" } (qw(' . join(" ", SCRIPTS) . '), @pscripts);',
-    		"",  "# list of PERL libraries",
-    		'our @libs = map { "$source/$_" } (qw(' . join(" ", LIBS) . '), @plibs);');
+            'our @scripts = map { "$source/$_" } (qw(' . join(" ", SCRIPTS) . '), @pscripts);',
+            "",  "# list of PERL libraries",
+            'our @libs = map { "$source/$_" } (qw(' . join(" ", LIBS) . '), @plibs);');
     # Now comes the Shrub configuration section.
     Env::WriteLines($oh, "", "", "# SHRUB CONFIGURATION", "");
     Env::WriteParam($oh, 'root directory for Shrub data files (should have subdirectories "Inputs" (optional), "DnaRepo" (required) and "LoadFiles" (required))',
-    		shrub_dir => "$dataRootDir");
+            shrub_dir => "$dataRootDir");
     Env::WriteParam($oh, 'full name of the Shrub DBD XML file', shrub_dbd => "$base_dir/ERDB/ShrubDBD.xml");
     Env::WriteParam($oh, 'Shrub database signon info (name/password)', userData => "seed/");
     Env::WriteParam($oh, 'name of the Shrub database', shrubDB => "seedtk_shrub");
     Env::WriteParam($oh, 'TRUE if we should create indexes before a table load (generally TRUE for MySQL, FALSE for PostGres)',
-    		preIndex => 1);
+            preIndex => 1);
     Env::WriteParam($oh, 'default DBMS (currently only "mysql" works for sure)', dbms => "mysql");
     Env::WriteParam($oh, 'database access port', dbport => 3306);
     Env::WriteParam($oh, 'TRUE if we are using an old version of MySQL (legacy parameter; may go away)', mysql_v3 => 0);
     Env::WriteParam($oh, 'default MySQL storage engine', default_mysql_engine => "InnoDB");
     Env::WriteParam($oh, 'default database host server', dbhost => "seed-db-write.mcs.anl.gov");
     Env::WriteParam($oh, 'TRUE to turn off size estimates during table creation-- should be FALSE for MyISAM',
-    		disable_dbkernel_size_estimates => 1);
+            disable_dbkernel_size_estimates => 1);
     Env::WriteParam($oh, 'mode for LOAD TABLE INFILE statements, empty string is OK except in special cases (legacy parameter; may go away)',
-    		load_mode => '');
+            load_mode => '');
     ## Put new Shrub parameters here.
-	# Write the trailer.
-	print $oh "\n1;\n";
-	# Close the output file.
-	close $oh;
+    # Write the trailer.
+    print $oh "\n1;\n";
+    # Close the output file.
+    close $oh;
 }
 
 =head3 WriteAllConfigs
@@ -481,7 +482,7 @@ Command-line options object.
 
 =cut
 
-	use constant REGKEY => 'SYSTEM/CurrentControlSet/Control/Session Manager/Environment';
+    use constant REGKEY => 'SYSTEM/CurrentControlSet/Control/Session Manager/Environment';
 
 sub WriteAllConfigs {
     # Get the parameters.
@@ -493,17 +494,17 @@ sub WriteAllConfigs {
     # environment cluster if we are writing to the registry.
     my $oh;
     if ($opt->uc eq 'sys') {
-    	# Here we are updating the registry.
-    	$oh = Env->GetRegKey(HKLM => REGKEY);
-    	print "Writing environment changes to registry.\n";
+        # Here we are updating the registry.
+        $oh = Env->GetRegKey(HKLM => REGKEY);
+        print "Writing environment changes to registry.\n";
     } else {
-    	# Here we are writing to a file.
-    	open($oh, ">$fileName") || die "Could not open UConfig file $fileName: $!";
-    	print "Writing environment changes to $fileName.\n";
-	    # Check for a PERL fix requirement.
-	    if ($opt->pfix) {
-	    	CopyPerlFix($oh, $base_dir);
-	    }
+        # Here we are writing to a file.
+        open($oh, ">$fileName") || die "Could not open UConfig file $fileName: $!";
+        print "Writing environment changes to $fileName.\n";
+        # Check for a PERL fix requirement.
+        if ($opt->pfix) {
+            CopyPerlFix($oh, $base_dir);
+        }
     }
     # Compute the script paths.
     my $paths = Env::BuildPathList($opt->winmode, $delim, @FIG_Config::scripts);
@@ -521,7 +522,7 @@ sub WriteAllConfigs {
 
 =head3 CopyPerlFix
 
-	CopyPerlFix($oh, $base_dir);
+    CopyPerlFix($oh, $base_dir);
 
 Copy the B<PerlPath.sh> file into the specified output file. This puts a PERL directory correction
 into the path so that the correct PERL version is run.
@@ -539,24 +540,24 @@ Root directory for the source tree. B<PerlPath.sh> will be in its B<config> subd
 =back
 
 =cut
- 
+
 sub CopyPerlFix {
-	# Get the parameters.
-	my ($oh, $base_dir) = @_;
- 	# Start with a comment.
-   	print $oh "# Fix PERL execution path.\n";
-   	# Get the PERL fix file.
-   	open(my $ih, "<$base_dir/config/PerlPath.sh") || die "Could not open PerlPath.sh: $!";
-	# Spool it to the environment script.
-	print $oh (<$ih>);
-	# Add a spacer.
-	print $oh "\n";
+    # Get the parameters.
+    my ($oh, $base_dir) = @_;
+     # Start with a comment.
+       print $oh "# Fix PERL execution path.\n";
+       # Get the PERL fix file.
+       open(my $ih, "<$base_dir/config/PerlPath.sh") || die "Could not open PerlPath.sh: $!";
+    # Spool it to the environment script.
+    print $oh (<$ih>);
+    # Add a spacer.
+    print $oh "\n";
 }
 
 
 =head3 SetupVHosts
 
-	SetupVHosts($fileName, $winmode);
+    SetupVHosts($fileName, $winmode);
 
 This method updates an Apache vhosts file to enable the fig.localhost virtual local
 server for SEEDtk development. It replaces or adds a specially-marked section that
@@ -577,65 +578,65 @@ TRUE if the server is on Windows, else FALSE.
 =cut
 
 sub SetupVHosts {
-	# Get the parameters.
-	my ($fileName, $winmode) = @_;
-	# Open the configuration file for input.
-	open(my $ih, "<$fileName") || die "Could not open configuration file $fileName: $!";
-	# We'll put the file lines in here, omitting any existing SEEDtk section.
-	my @lines;
-	my $skipping;
-	while (! eof $ih) {
-		my $line = <$ih>;
-		# Are we in the SEEDtk section?
-		if ($skipping) {
-			# Yes. Check for an end marker.
-			if ($line =~ /^## END SEEDtk SECTION/) {
-				# Found it. Stop skipping.
-				$skipping = 0;
-			}
-		} else {
-			# No. Check for a begin marker.
-			if ($line =~ /^## BEGIN SEEDtk SECTION/) {
-				# Found it. Start skipping.
-				$skipping = 1;
-			} else {
-				# Not a marker. Save the line.
-				push @lines, $line;
-			}
-		}
-	}
-	# Close the file.
-	close $ih;
-	# Open it again for output.
-	open(my $oh, ">$fileName") || die "Could not open configuration file $fileName: $!";
-	# Unspool the lines from the old file.
-	for my $line (@lines) {
-		print $oh $line;
-	}
-	# Now we add our new stuff. First, get the name of the web and source directories.
-	# The BuildPathList normalizes the paths according to the target environment.
-	my $paths = Env::BuildPathList($winmode, ";", $FIG_Config::web_dir, $FIG_Config::source);
-	# Fix the Windows backslash craziness. Apache requires forward slashes.
-	$paths =~ tr/\\/\//;
-	# Extract the individual directories.
-	my ($webdir, $sourcedir) = split /;/, $paths;
-	# Write the start marker.
-	print $oh "## BEGIN SEEDtk SECTION\n";
-	# Declare the root directory for the virtual host.
-	print $oh "<Directory \"$webdir\">\n";
+    # Get the parameters.
+    my ($fileName, $winmode) = @_;
+    # Open the configuration file for input.
+    open(my $ih, "<$fileName") || die "Could not open configuration file $fileName: $!";
+    # We'll put the file lines in here, omitting any existing SEEDtk section.
+    my @lines;
+    my $skipping;
+    while (! eof $ih) {
+        my $line = <$ih>;
+        # Are we in the SEEDtk section?
+        if ($skipping) {
+            # Yes. Check for an end marker.
+            if ($line =~ /^## END SEEDtk SECTION/) {
+                # Found it. Stop skipping.
+                $skipping = 0;
+            }
+        } else {
+            # No. Check for a begin marker.
+            if ($line =~ /^## BEGIN SEEDtk SECTION/) {
+                # Found it. Start skipping.
+                $skipping = 1;
+            } else {
+                # Not a marker. Save the line.
+                push @lines, $line;
+            }
+        }
+    }
+    # Close the file.
+    close $ih;
+    # Open it again for output.
+    open(my $oh, ">$fileName") || die "Could not open configuration file $fileName: $!";
+    # Unspool the lines from the old file.
+    for my $line (@lines) {
+        print $oh $line;
+    }
+    # Now we add our new stuff. First, get the name of the web and source directories.
+    # The BuildPathList normalizes the paths according to the target environment.
+    my $paths = Env::BuildPathList($winmode, ";", $FIG_Config::web_dir, $FIG_Config::source);
+    # Fix the Windows backslash craziness. Apache requires forward slashes.
+    $paths =~ tr/\\/\//;
+    # Extract the individual directories.
+    my ($webdir, $sourcedir) = split /;/, $paths;
+    # Write the start marker.
+    print $oh "## BEGIN SEEDtk SECTION\n";
+    # Declare the root directory for the virtual host.
+    print $oh "<Directory \"$webdir\">\n";
     print $oh "    Options Indexes FollowSymLinks ExecCGI\n";
     print $oh "    AllowOverride None\n";
     print $oh "    Require all granted\n";
-	print $oh "</Directory>\n";
-	print $oh "\n";
-	# Configure the virtual host itself.
-	print $oh "<VirtualHost *:80>\n";
-	# Declare the URL and file location of the root directory.
+    print $oh "</Directory>\n";
+    print $oh "\n";
+    # Configure the virtual host itself.
+    print $oh "<VirtualHost *:80>\n";
+    # Declare the URL and file location of the root directory.
     print $oh "    DocumentRoot \"$webdir\"\n";
     print $oh "    ServerName fig.localhost\n";
     # If this is Windows, set up the registry for CGI execution.
     if ($winmode) {
-    	print $oh "    ScriptInterpreterSource Registry\n";
+        print $oh "    ScriptInterpreterSource Registry\n";
     }
     # Define the local logs.
     print $oh "    ErrorLog \"$webdir/logs/error.log\"\n";
@@ -643,11 +644,11 @@ sub SetupVHosts {
     # Set up the default files for each directory to the usual suspects.
     print $oh "    DirectoryIndex index.cgi index.html index.htm\n";
     # Finish the host definition.
-	print $oh "</VirtualHost>\n";
-	# Write the end marker.
-	print $oh "## END SEEDtk SECTION\n";
-	# Close the output file.
-	close $oh;
+    print $oh "</VirtualHost>\n";
+    # Write the end marker.
+    print $oh "## END SEEDtk SECTION\n";
+    # Close the output file.
+    close $oh;
 }
 
 =head3 BuildPaths
@@ -686,17 +687,17 @@ sub BuildPaths {
     my ($winmode, $label, $rootDir, @subdirs) = @_;
     # Loop through the new paths.
     for my $path (@subdirs) {
-    	my $newPath = "$rootDir/$path";
-    	# Check to see if the directory is already there.
-    	if (! -d $newPath) {
-    		# No, we must create it.
-    		File::Path::make_path($newPath);
-    		print "$label directory $newPath created.\n";
-    		# If this is Unix, fix the permissions.
-    		if (! $winmode) {
-    			chmod 0777, $newPath;
-    		}
-    	}
+        my $newPath = "$rootDir/$path";
+        # Check to see if the directory is already there.
+        if (! -d $newPath) {
+            # No, we must create it.
+            File::Path::make_path($newPath);
+            print "$label directory $newPath created.\n";
+            # If this is Unix, fix the permissions.
+            if (! $winmode) {
+                chmod 0777, $newPath;
+            }
+        }
     }
 }
 
@@ -740,13 +741,13 @@ sub FixPermissions {
     closedir $dh;
     # Loop through the files.
     for my $file (@files) {
-    	# Compose the full file name.
-    	my $fileName = "$directory/$file";
-    	# Compute the new mode.
-    	my $finfo = stat $fileName;
-    	my $newMode = ($finfo->[2] & 0777) | $mask;
-    	# Update the file.
-    	chmod $newMode, $fileName;
+        # Compose the full file name.
+        my $fileName = "$directory/$file";
+        # Compute the new mode.
+        my $finfo = stat $fileName;
+        my $newMode = ($finfo->[2] & 0777) | $mask;
+        # Update the file.
+        chmod $newMode, $fileName;
     }
 }
 

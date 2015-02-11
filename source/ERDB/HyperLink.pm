@@ -17,6 +17,7 @@
 # http://www.theseed.org/LICENSE.TXT.
 #
 
+
 package HyperLink;
 
     use strict;
@@ -77,7 +78,7 @@ sub new {
     # Convert an empty or zero link to an undefined one.
     my $url = (! $link ? undef : $link);
     # Create the HyperLink object.
-    my $retVal = { 
+    my $retVal = {
                     text => $text,
                     link => $url,
                  };
@@ -166,7 +167,7 @@ sub Decode {
             $url = $1;
         }
     }
-    
+
     # Form a hyperlink out of the two pieces.
     my $retVal = HyperLink->new($text, $url);
     return $retVal;

@@ -22,6 +22,7 @@
     use Tracer;
     use Shrub;
 
+
 =head1 Verify Relationship Integrity in a Shrub Database
 
     ShrubFixRels [options] dbName rel1 rel2 ...
@@ -47,33 +48,33 @@ specified on the command line.
 
 =cut
 
-	$| = 1; # Prevent buffering on STDOUT.
-	# Connect to the database.
-	my ($shrub, $opt) = Shrub->new_for_script('%c %o', {}, ["all|a", "process all relationships"]);
+    $| = 1; # Prevent buffering on STDOUT.
+    # Connect to the database.
+    my ($shrub, $opt) = Shrub->new_for_script('%c %o', {}, ["all|a", "process all relationships"]);
     # Create the statistics object.
     my $stats = Stats->new();
-	# Get the relationship names.
-	my @rels;
-	if ($opt->all) {
-		# Here the user wants all relationships in the database. Insure no relationships have
-		# been specified on the command line.
-		if (scalar @ARGV) {
-			die "ALL specified along with listed relationship names. Use one or the other.";
-		}
-		# Get the list of relationship names.
-		@rels = $shrub->GetRelationshipTypes();
-	} elsif (! scalar @rels) {
-		# Here there is nothing to do.
-		die "No relationships specified for processing.";
-	} else {
-		# Here the user specified a list of relationship names.
-		@rels = @ARGV;
-	}
-	# Loop through the list of relationships.
-	for my $rel (@rels) {
-	    print "Processing $rel.\n";
-	    my $subStats = $shrub->FixRelationship($rel);
-	    $stats->Accumulate($subStats);
-	}
-	# Denote we're done.
-	print "All done.\n" . $stats->Show();
+    # Get the relationship names.
+    my @rels;
+    if ($opt->all) {
+        # Here the user wants all relationships in the database. Insure no relationships have
+        # been specified on the command line.
+        if (scalar @ARGV) {
+            die "ALL specified along with listed relationship names. Use one or the other.";
+        }
+        # Get the list of relationship names.
+        @rels = $shrub->GetRelationshipTypes();
+    } elsif (! scalar @rels) {
+        # Here there is nothing to do.
+        die "No relationships specified for processing.";
+    } else {
+        # Here the user specified a list of relationship names.
+        @rels = @ARGV;
+    }
+    # Loop through the list of relationships.
+    for my $rel (@rels) {
+        print "Processing $rel.\n";
+        my $subStats = $shrub->FixRelationship($rel);
+        $stats->Accumulate($subStats);
+    }
+    # Denote we're done.
+    print "All done.\n" . $stats->Show();

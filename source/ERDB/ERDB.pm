@@ -1,9 +1,5 @@
 package ERDB;
 
-#
-# This is a SAS component
-#
-
     use strict;
     use base qw(Exporter);
     use vars qw(@EXPORT_OK);
@@ -554,7 +550,7 @@ Sort order of the field-- C<ascending> or C<descending>.
 
 =back
 
-The B<FromIndex>, B<ToIndex> and B<Index> tags can have a B<unique> attribute. 
+The B<FromIndex>, B<ToIndex> and B<Index> tags can have a B<unique> attribute.
 If specified, the index will be generated as a unique index. The B<ToIndex>
 for a one-to-many relationship is always unique.
 
@@ -3377,7 +3373,7 @@ process will stay alive, but a message will be put into the statistics object.
 
 =item dup
 
-If C<ignore>, duplicate rows will be ignored. If C<replace>, duplicate rows will 
+If C<ignore>, duplicate rows will be ignored. If C<replace>, duplicate rows will
 replace previous instances. If omitted, duplicate rows will cause an error.
 
 =back
@@ -3429,7 +3425,7 @@ sub LoadTable {
     my $rv;
     eval {
         $rv = $dbh->load_table(file => $fileName, tbl => $relationName,
-                               style => $options{mode}, 'local' => 'LOCAL', 
+                               style => $options{mode}, 'local' => 'LOCAL',
                                dup => $options{dup} );
     };
     if (!defined $rv) {
@@ -3953,8 +3949,8 @@ sub CreateTable {
 
 =head3 ComputeFieldString
 
-	my $fieldString = $erdb->ComputeFieldString($relationName);
-	
+    my $fieldString = $erdb->ComputeFieldString($relationName);
+
 Return the comma-delimited field definition string for a relation. This can be plugged directly into an SQL
 C<CREATE> statement.
 
@@ -3973,8 +3969,8 @@ Returns a string listing SQL field definitions, in the proper order, separated b
 =cut
 
 sub ComputeFieldString {
-	# Get the parameters.
-	my ($self, $relationName) = @_;
+    # Get the parameters.
+    my ($self, $relationName) = @_;
     # Get the relation data.
     my $relationData = $self->FindRelation($relationName);
     # Create a list of the field data.
@@ -4452,7 +4448,7 @@ sub FixRelationship {
         }
         # Process the residual batch (if any).
         if (@idList) {
-        	$self->_ProcessFixRelationshipBatch($retVal, $name, $entity, $dir, \@idList, $testOnly);
+            $self->_ProcessFixRelationshipBatch($retVal, $name, $entity, $dir, \@idList, $testOnly);
         }
     }
     # Return the statistics object with the results.
@@ -4480,8 +4476,8 @@ sub _ProcessFixRelationshipBatch {
             # Key was not found, so delete its relationship rows.
             $stats->Add("$entity-keyNotFound" => 1);
             if (! $testOnly) {
-	            my $count = $self->DeleteLike($name, $filter, [$id]);
-	            $stats->Add("$name-delete$dir" => $count);
+                my $count = $self->DeleteLike($name, $filter, [$id]);
+                $stats->Add("$name-delete$dir" => $count);
             }
         }
     }
@@ -4519,7 +4515,7 @@ sub CleanRelationship {
     my ($self, $relName, @fields) = @_;
     # Build the ORDER BY clause for the query. For best performance, the extra fields
     # should be those in the from-index, in order.
-    my $clause = "$relName(from-link) = ? ORDER BY " . 
+    my $clause = "$relName(from-link) = ? ORDER BY " .
             join(", ", map { "$relName($_)" } (@fields, 'to-link'));
     # Create the return statistics object.
     my $retVal = Stats->new();
@@ -4785,9 +4781,9 @@ sub InsertValue {
 =head3 InsertObject
 
     $erdb->InsertObject($objectType, %fieldHash);
-    
+
     or
-    
+
     $erdb->InsertObject($objectType, \%fieldHash, %options);
 
 Insert an object into the database. The object is defined by a type name and
@@ -4923,13 +4919,13 @@ sub InsertObject {
         # Build the INSERT statement.
         my $command = "INSERT";
         if ($options->{ignore}) {
-        	$command = "INSERT IGNORE";       	
+            $command = "INSERT IGNORE";
         } elsif ($options->{dup}) {
-        	if ($options->{dup} eq 'ignore') {
-        		$command = "INSERT IGNORE";
-        	} elsif ($options->{dup} eq 'replace') {
-        		$command = "REPLACE";
-        	}
+            if ($options->{dup} eq 'ignore') {
+                $command = "INSERT IGNORE";
+            } elsif ($options->{dup} eq 'replace') {
+                $command = "REPLACE";
+            }
         }
         my $statement = "$command INTO $q$newObjectType$q (" . join (', ', @fieldNameList) .
             ") VALUES (";
@@ -4978,9 +4974,9 @@ sub InsertObject {
 =head3 UpdateEntity
 
     $erdb->UpdateEntity($entityName, $id, %fields);
-    
+
 or
-    
+
     my $ok = $erdb->UpdateEntity($entityName, $id, \%fields, $optional);
 
 Update the values of an entity. This is an unprotected update, so it should only be
@@ -5017,7 +5013,7 @@ sub UpdateEntity {
     # Get the parameters.
     my ($self, $entityName, $id, $first, @leftovers) = @_;
     # Get the field hash and optional-update flag.
-    my ($fields, $optional);    
+    my ($fields, $optional);
     if (ref $first eq 'HASH') {
         $fields = $first;
         $optional = $leftovers[0];
@@ -5340,8 +5336,8 @@ sub Delete {
             # Get ready for the DELETE statement. First we need the table being
             # deleted.
             my $target = $pathTables[$#pathTables];
-            # We start with the WHERE. The first thing is the ID field from the starting 
-            # table. That starting table will either be the entity relation or one of 
+            # We start with the WHERE. The first thing is the ID field from the starting
+            # table. That starting table will either be the entity relation or one of
             # the entity's sub-relations.
             my $stmt = " WHERE $self->{_quote}$pathTables[0]$self->{_quote}.id = ?";
             # Now we run through the remaining entities in the path, connecting them up.
@@ -6213,7 +6209,7 @@ sub _SingleTableHash {
         my $fieldData = $self->_FindField($key, $objectName);
         my $value = $fieldHash->{$key};
         if (! $unchanged) {
-        	$value = encode($fieldData->{type}, $value);
+            $value = encode($fieldData->{type}, $value);
         }
         $retVal{$fieldData->{name}} = $value;
     }
@@ -7257,7 +7253,7 @@ sub _CreateRelationshipIndex {
     # If this is a one-to-many relationship, the "To" index is unique. The index
     # can also be forced unique by the user.
     if ($relationshipStructure->{arity} eq "1M" && $indexKey eq "To" ||
-    	$relationshipStructure->{unique}) {
+        $relationshipStructure->{unique}) {
         $newIndex->{unique} = 1;
     }
     # Add the index to the relation.

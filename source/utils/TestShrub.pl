@@ -24,4 +24,4 @@
     
     print join("\n", @INC, "");
 
-	Env::WriteLines(\*STDOUT, "This is line 1.", "This is line 1");
+    Env::WriteLines(\*STDOUT, "This is line 1.", "This is line 1");

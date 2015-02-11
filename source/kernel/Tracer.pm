@@ -16,9 +16,6 @@
 # http://www.theseed.org/LICENSE.TXT.
 ########################################################################
 
-#
-# This is a SAS component.
-#
 
 package Tracer;
 
@@ -49,12 +46,12 @@ package Tracer;
     # that might need Tracer.
     #
     BEGIN {
-		eval {
-		    require FIG_Config;
-		};
-		if ($@) {
-			$FIG_Config::temp = "/tmp";
-		}
+        eval {
+            require FIG_Config;
+        };
+        if ($@) {
+            $FIG_Config::temp = "/tmp";
+        }
     }
 
 =head1 Tracing and Debugging Helpers
@@ -476,7 +473,7 @@ sub Trace {
     # Strip off any line terminators at the end of the message. We will add
     # new-line stuff ourselves.
     my $stripped = Strip($message);
-    # Compute the caller information. 
+    # Compute the caller information.
     my ($callPackage, $callFile, $callLine) = caller();
     my $callFileTitle = basename($callFile);
     # Check the caller.
@@ -1339,7 +1336,7 @@ sub GetFile {
     # characters.
     my $lineCount = 0;
     while (! eof $handle) {
-    	my $line = <$handle>;
+        my $line = <$handle>;
         $lineCount++;
         $line = Strip($line);
         push @retVal, $line;

@@ -49,20 +49,20 @@ If specified, the script will recompute each genome's MD5 from its contigs file.
 
 =cut
 
-	$| = 1; # Prevent buffering on STDOUT.
-	# Connect to the database.
-	my ($shrub, $opt) = Shrub->new_for_script('%c %o genomeDIrectory', { offline => 1 },
-			["fixMD5|f", "recompute MD5 identifiers in the genome-info files"]);
+    $| = 1; # Prevent buffering on STDOUT.
+    # Connect to the database.
+    my ($shrub, $opt) = Shrub->new_for_script('%c %o genomeDIrectory', { offline => 1 },
+            ["fixMD5|f", "recompute MD5 identifiers in the genome-info files"]);
     # Create the loader object.
     my $loader = ShrubLoader->new($shrub);
     my $stats = $loader->stats;
     # Insure we have a genome directory.
     my ($genomeDir) = $ARGV[0];
     if (! $genomeDir) {
-    	$genomeDir = "$FIG_Config::shrub_dir/Inputs/GenomeData";
+        $genomeDir = "$FIG_Config::shrub_dir/Inputs/GenomeData";
     }
     if (! -d $genomeDir) {
-    	die "Invalid genome directory $genomeDir.";
+        die "Invalid genome directory $genomeDir.";
     }
     # Open the output file.
     open(my $oh, ">$genomeDir/index") || die "Could not open index file for output: $!";
@@ -73,30 +73,29 @@ If specified, the script will recompute each genome's MD5 from its contigs file.
     my $genomeDirs = $loader->FindGenomeList($genomeDir, useDirectory => 1);
     # Loop through the genomes.
     for my $genome (sort keys %$genomeDirs) {
-    	# Get this genome's directory.
-    	my $genomeLoc = $genomeDirs->{$genome};
-    	# Read its metadata.
-    	my $metaHash = $loader->ReadMetaData("$genomeLoc/genome-info", required => 'name');
-    	# Relocate the directory so that it is relative to the repository.
-    	my $genomeRelLoc = substr($genomeLoc, $repoNameLen + 1);
-    	# Write the ID, name, and directory to the output file.
-    	print $oh join("\t", $genome, $metaHash->{name}, $genomeRelLoc) . "\n";
-    	$stats->Add(genomeOut => 1);
-    	# Are we fixing MD5s?
-    	if ($opt->fixmd5) {
-    		# Yes. Get the MD5 from the contigs file.
-    		my $correctMD5 = MD5Computer->new_from_fasta("$genomeLoc/contigs")->genomeMD5();
-    		$stats->Add(md5_checked => 1);
-    		if (! $metaHash->{md5} || $correctMD5 ne $metaHash->{md5}) {
-    			print "Correcting MD5 for $genome.\n";
-    			$stats->Add(md5_fixed => 1);
-    			$metaHash->{md5} = $correctMD5;
-    			$loader->WriteMetaData("$genomeLoc/genome-info", $metaHash);
-    		}
-    	}
+        # Get this genome's directory.
+        my $genomeLoc = $genomeDirs->{$genome};
+        # Read its metadata.
+        my $metaHash = $loader->ReadMetaData("$genomeLoc/genome-info", required => 'name');
+        # Relocate the directory so that it is relative to the repository.
+        my $genomeRelLoc = substr($genomeLoc, $repoNameLen + 1);
+        # Write the ID, name, and directory to the output file.
+        print $oh join("\t", $genome, $metaHash->{name}, $genomeRelLoc) . "\n";
+        $stats->Add(genomeOut => 1);
+        # Are we fixing MD5s?
+        if ($opt->fixmd5) {
+            # Yes. Get the MD5 from the contigs file.
+            my $correctMD5 = MD5Computer->new_from_fasta("$genomeLoc/contigs")->genomeMD5();
+            $stats->Add(md5_checked => 1);
+            if (! $metaHash->{md5} || $correctMD5 ne $metaHash->{md5}) {
+                print "Correcting MD5 for $genome.\n";
+                $stats->Add(md5_fixed => 1);
+                $metaHash->{md5} = $correctMD5;
+                $loader->WriteMetaData("$genomeLoc/genome-info", $metaHash);
+            }
+        }
     }
     # Close the output file.
     close $oh;
     # Tell the user we're done.
     print "Directory processed.\n" . $stats->Show();
-

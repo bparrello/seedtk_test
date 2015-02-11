@@ -9,12 +9,9 @@
 # http://www.theseed.org/LICENSE.TXT.
 #
 
-#
-# This is a SAS component.
-#
 package FBasicLocation;
 
-	use strict;
+    use strict;
     use base qw(BasicLocation);
 
 =head2 Forward Basic Location Object
@@ -622,7 +619,7 @@ sub Gap {
 
 =head3 Tail
 
-	$loc->Tail($len)
+    $loc->Tail($len)
 
 Reduce the length of the location to the specified amount at the end
 of the location's span.
@@ -638,11 +635,11 @@ Length of the tail area to keep.
 =cut
 
 sub Tail {
-	# Get the parameters.
-	my ($self, $len) = @_;
-	# Move the begin point closer to the end.
-	$self->{_beg} = $self->{_end} - $len + 1;
-	$self->{_len} = $len;
+    # Get the parameters.
+    my ($self, $len) = @_;
+    # Move the begin point closer to the end.
+    $self->{_beg} = $self->{_end} - $len + 1;
+    $self->{_len} = $len;
 }
 
 

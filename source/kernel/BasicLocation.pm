@@ -830,7 +830,7 @@ location's end point, the returned value will be negative.
 
 =head3 Tail
 
-	$loc->Tail($len)
+    $loc->Tail($len)
 
 Reduce the length of the location to the specified amount at the end
 of the location's span.
@@ -860,5 +860,6 @@ sub min {
     my ($a, $b) = @_;
     return ($a < $b ? $a : $b);
 }
+
 
 1;

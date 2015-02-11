@@ -25,6 +25,7 @@ package ERDBTypeCountVector;
     use CGI;
     use base qw(ERDBType);
 
+
 =head1 ERDB CountVector Descriptor Type Definition
 
 =head2 Introduction

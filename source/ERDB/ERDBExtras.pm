@@ -1,9 +1,5 @@
 #!/usr/bin/perl -w
 
-#
-# This is a SAS component.
-#
-
 use strict;
 BEGIN {
     eval { require FIG_Config; };

@@ -1,6 +1,6 @@
 package TestMethod;
 
-	use lib::Web_Config;
+    use lib::Web_Config;
 
 =head3 TestMethod
 
@@ -10,9 +10,7 @@ will be dumped when you click the TEST button on the Method.html page.
 =cut
 
 sub TestMethod {
-	return \@INC;
+    return \@INC;
 }
-
-
 
 1;

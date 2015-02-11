@@ -135,7 +135,7 @@ sub new {
         $erdb = $db;
     }
     # Create the ERDBQueryConsole object.
-    my $retVal = { 
+    my $retVal = {
                     erdb => $erdb,
                     secure => $secure,
                     raw => $raw,
@@ -776,8 +776,6 @@ sub Clear {
     # Denote we have no query attached.
     $self->{query} = undef;
 }
-
-
 
 
 1;

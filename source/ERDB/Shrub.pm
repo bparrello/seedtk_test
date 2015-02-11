@@ -17,6 +17,7 @@
 # http://www.theseed.org/LICENSE.TXT.
 #
 
+
 package Shrub;
 
     use strict;
@@ -63,7 +64,7 @@ not related to a particular genome.
 
     # Name of the global section
     use constant GLOBAL => 'Globals';
-    
+
 =head3 new
 
     my $shrub = Shrub->new(%options);
@@ -140,7 +141,7 @@ sub new {
     my $dbms = $options{dbms} || 'mysql';
     # Insure that if the user specified a DBD, it overrides the internal one.
     if ($options{DBD} && ! defined $options{externalDBD}) {
-    	$options{externalDBD} = 1;
+        $options{externalDBD} = 1;
     }
     # Compute the socket. An empty string is a valid override here.
     my $sock = $options{sock} || "";
@@ -151,7 +152,7 @@ sub new {
     # Connect to the database, if desired.
     my $dbh;
     if (! $options{offline}) {
-     	$dbh = DBKernel->new($dbms, $dbName, $user, $pass, $port, $dbhost, $sock);
+         $dbh = DBKernel->new($dbms, $dbName, $user, $pass, $port, $dbhost, $sock);
     }
     # Create the ERDB object.
     my $retVal = ERDB::new($class, $dbh, $dbd, %options);
@@ -173,17 +174,17 @@ If the command-line parse fails, the method will die with a usage message.
 
 For example
 
-	my ($shrub, $opt, $usage) = Shrub->new_for_script('%c %o genome1 genome2 ...', 
-			{ offline => 1},
-			[ 'missing|m', "only load missing genomes"],
-			[ 'directory|d=s', "source directory", { default => '/vol/fig/shrub_data' }]);
+    my ($shrub, $opt, $usage) = Shrub->new_for_script('%c %o genome1 genome2 ...',
+            { offline => 1},
+            [ 'missing|m', "only load missing genomes"],
+            [ 'directory|d=s', "source directory", { default => '/vol/fig/shrub_data' }]);
 
 will create an offline L<Shrub> object. The C<$opt> object will have a member
 C<missing> that is TRUE if we should only load missing genomes and a member
 C<directory> that returns the source directory. The C<text> member of C<$usage> can
 be used to display a usage string in error messages, and if the user invokes the
 C<--help> option on the command line, all of the option information will be displayed
-in full detail. 
+in full detail.
 
 The following command-line options (all of which are optional) will
 be processed by this method automatically and used to construct the Shrub object.
@@ -249,21 +250,21 @@ sub new_for_script {
     my ($class, $program, $tuning, @options) = @_;
     # Parse the command line.
     my ($opt, $usage) = describe_options($program,
-    		[ "loadDirectory=s", "directory for creating table load files" ],
-    		[ "DBD=s", "file containing the database definition XML" ],
-    		[ "dbName=s", "database name" ],
-    		[ "sock=s", "MYSQL socket" ],
-            [ "userData=s", "name/password for database logon" ],
-            [ "dbhost=s", "database host server" ],
-            [ "port=i", "mysql port" ],
-            [ "dbms=s", "database management system" ],
-            [ "repository=s", "genome repository directory root" ],
-            [ "help|h", "display usage information", { shortcircuit => 1}],
-            @options);
+           [ "loadDirectory=s", "directory for creating table load files" ],
+           [ "DBD=s", "file containing the database definition XML" ],
+           [ "dbName=s", "database name" ],
+           [ "sock=s", "MYSQL socket" ],
+           [ "userData=s", "name/password for database logon" ],
+           [ "dbhost=s", "database host server" ],
+           [ "port=i", "mysql port" ],
+           [ "dbms=s", "database management system" ],
+           [ "repository=s", "genome repository directory root" ],
+           [ "help|h", "display usage information", { shortcircuit => 1}],
+           @options);
     # The above method dies if the options are invalid. Check here for the HELP option.
     if ($opt->help) {
-    	print $usage->text;
-    	exit;
+        print $usage->text;
+        exit;
     }
     # Check for an external DBD override.
     my $externalDBD = $tuning->{externalDBD} || $opt->dbd;
@@ -278,21 +279,20 @@ sub new_for_script {
     return ($retVal, $opt, $usage);
 }
 
-	
 
 =head2 Public Methods
 
 =head3 DNArepo
 
-	my $dirName = $shrub->DNArepo
+    my $dirName = $shrub->DNArepo
 
 Returns the name of the directory containing the DNA repository.
 
 =cut
 
 sub DNArepo {
-	my ($self) = @_;
-	return $self->{repository};
+    my ($self) = @_;
+    return $self->{repository};
 }
 
 
@@ -302,7 +302,7 @@ sub DNArepo {
 
 or
 
-	my $key = Shrub::ProteinID($sequence);
+    my $key = Shrub::ProteinID($sequence);
 
 Return the protein sequence ID that would be associated with a specific
 protein sequence.
@@ -323,8 +323,8 @@ in the database, it will have this ID in the B<Protein> table.
 =cut
 
 sub ProteinID {
-	# Convert from the instance form of the call to a direct call.
-	shift if UNIVERSAL::isa($_[0], __PACKAGE__);
+    # Convert from the instance form of the call to a direct call.
+    shift if UNIVERSAL::isa($_[0], __PACKAGE__);
     # Get the parameters.
     my ($sequence) = @_;
     # Compute the MD5 hash.
@@ -339,7 +339,7 @@ sub ProteinID {
 
 or
 
-	my $subID = Shrub::SubsystemID($subName);
+    my $subID = Shrub::SubsystemID($subName);
 
 Return the ID of the subsystem with the specified name.
 
@@ -359,8 +359,8 @@ Returns a normalized subsystem name.
 =cut
 
 sub SubsystemID {
-	# Convert from the instance form of the call to a direct call.
-	shift if UNIVERSAL::isa($_[0], __PACKAGE__);
+    # Convert from the instance form of the call to a direct call.
+    shift if UNIVERSAL::isa($_[0], __PACKAGE__);
     # Get the parameters.
     my ($subName) = @_;
     # Normalize the subsystem name by converting underscores to spaces.
@@ -380,43 +380,43 @@ sub SubsystemID {
 
 =head3 MAX_PRIVILEGE
 
-	my $priv = Shrub::MAX_PRIVILEGE;
+    my $priv = Shrub::MAX_PRIVILEGE;
 
 Return the maximum privilege level for functional assignments.
 
 =cut
 
-	use constant MAX_PRIVILEGE => 2;
+    use constant MAX_PRIVILEGE => 2;
 
 =head3 EC_PATTERN
 
-	$string =~ /$Shrub::EC_PATTERN/;
+    $string =~ /$Shrub::EC_PATTERN/;
 
 Pre-compiled pattern for matching EC numbers.
 
 =cut
 
-	our $EC_PATTERN = qr/\(\s*E\.?C\.?(?:\s+|:)(\d\.(?:\d+|-)\.(?:\d+|-)\.(?:n?\d+|-)\s*)\)/;
+    our $EC_PATTERN = qr/\(\s*E\.?C\.?(?:\s+|:)(\d\.(?:\d+|-)\.(?:\d+|-)\.(?:n?\d+|-)\s*)\)/;
 
 =head3 TC_PATTERN
 
-	$string =~ /$Shrub::TC_PATTERN/;
+    $string =~ /$Shrub::TC_PATTERN/;
 
 Pre-compiled pattern for matchin TC numbers.
 
 =cut
 
-	our $TC_PATTERN = qr/\(\s*T\.?C\.?(?:\s+|:)(\d\.[A-Z]\.(?:\d+|-)\.(?:\d+|-)\.(?:\d+|-)\s*)\)/;
+    our $TC_PATTERN = qr/\(\s*T\.?C\.?(?:\s+|:)(\d\.[A-Z]\.(?:\d+|-)\.(?:\d+|-)\.(?:\d+|-)\s*)\)/;
 
 =head2 Function and Role Utilities
 
 =head3 RoleNormalize
 
-	my $normalRole = Shrub::RoleNormalize($role);
+    my $normalRole = Shrub::RoleNormalize($role);
 
 or
 
-	my $normalRole = $shrub->RoleNormalize($role);
+    my $normalRole = $shrub->RoleNormalize($role);
 
 Normalize a role by removing extra spaces, stripping off the EC number, and converting it to lower case.
 
@@ -435,31 +435,31 @@ Returns a normalized form of the role.
 =cut
 
 sub RoleNormalize {
-	# Convert from the instance form of the call to a direct call.
-	shift if UNIVERSAL::isa($_[0], __PACKAGE__);
-	# Get the parameters.
-	my ($role) = @_;
-	# Remove the EC number.
-	$role =~ s/$EC_PATTERN//;
-	# Remove the TC identifier.
-	$role =~ s/$TC_PATTERN//;
-	# Remove the extra spaces.
-	$role =~ s/\s+/ /g;
-	$role =~ s/^\s+//;
-	$role =~ s/\s+$//;
-	# Convert to lower case.
-	my $retVal = lc $role;
-	# Return the result.
-	return $retVal;
+    # Convert from the instance form of the call to a direct call.
+    shift if UNIVERSAL::isa($_[0], __PACKAGE__);
+    # Get the parameters.
+    my ($role) = @_;
+    # Remove the EC number.
+    $role =~ s/$EC_PATTERN//;
+    # Remove the TC identifier.
+    $role =~ s/$TC_PATTERN//;
+    # Remove the extra spaces.
+    $role =~ s/\s+/ /g;
+    $role =~ s/^\s+//;
+    $role =~ s/\s+$//;
+    # Convert to lower case.
+    my $retVal = lc $role;
+    # Return the result.
+    return $retVal;
 }
 
 =head3 ParseRole
 
-	my ($roleText, $ecNum, $tcNum, $hypo) = $shrub->ParseRole($role);
+    my ($roleText, $ecNum, $tcNum, $hypo) = $shrub->ParseRole($role);
 
 or
 
-	my ($roleText, $ecNum, $tcNum, $hypo) = Shrub::ParseRole($role);
+    my ($roleText, $ecNum, $tcNum, $hypo) = Shrub::ParseRole($role);
 
 Parse a role. The EC and TC numbers are extracted and an attempt is made to determine if the role is
 hypothetical.
@@ -473,7 +473,7 @@ Text of the role to parse.
 =item RETURN
 
 Returns a four-element list consisting of the main role text, the EC number (if any),
-the TC number (if any), and a flag that is TRUE if the role is hypothetical and FALSE 
+the TC number (if any), and a flag that is TRUE if the role is hypothetical and FALSE
 otherwise.
 
 =back
@@ -481,33 +481,33 @@ otherwise.
 =cut
 
 sub ParseRole {
-	# Convert from the instance form of the call to a direct call.
-	shift if UNIVERSAL::isa($_[0], __PACKAGE__);
-	# Get the parameters.
-	my ($role) = @_;
-	# Extract the EC number.
-	my ($ecNum, $tcNum) = ("", "");
-	my $roleText = $role;
-	if ($role =~ /(.+?)\s*$EC_PATTERN\s*(.*)/) {
-		$roleText = $1 . $3;
-		$ecNum = $2;
-	} elsif ($role =~ /(.+?)\s*$TC_PATTERN\s*(.*)/) {
-		$roleText = $1 . $3;
-		$tcNum = $2;
-	}
-	# Check for a hypothetical.
-	my $hypo = SeedUtils::hypo($roleText);
-	# Return the parse results.
-	return ($roleText, $ecNum, $tcNum, $hypo);
+    # Convert from the instance form of the call to a direct call.
+    shift if UNIVERSAL::isa($_[0], __PACKAGE__);
+    # Get the parameters.
+    my ($role) = @_;
+    # Extract the EC number.
+    my ($ecNum, $tcNum) = ("", "");
+    my $roleText = $role;
+    if ($role =~ /(.+?)\s*$EC_PATTERN\s*(.*)/) {
+        $roleText = $1 . $3;
+        $ecNum = $2;
+    } elsif ($role =~ /(.+?)\s*$TC_PATTERN\s*(.*)/) {
+        $roleText = $1 . $3;
+        $tcNum = $2;
+    }
+    # Check for a hypothetical.
+    my $hypo = SeedUtils::hypo($roleText);
+    # Return the parse results.
+    return ($roleText, $ecNum, $tcNum, $hypo);
 }
 
 =head3 Checksum
 
-	my $checksum = Shrub::Checksum($text);
+    my $checksum = Shrub::Checksum($text);
 
 or
 
-	my $checksum = $shrub->Checksum($text);
+    my $checksum = $shrub->Checksum($text);
 
 Compute the checksum for a text string. This is currently a simple MD5 digest.
 
@@ -526,19 +526,19 @@ Returns a fixed-length, digested form of the string.
 =cut
 
 sub Checksum {
-	# Convert from the instance form of the call to a direct call.
-	shift if UNIVERSAL::isa($_[0], __PACKAGE__);
-	# Return the digested string.
-	return Digest::MD5::md5_base64($_[0]);	
+    # Convert from the instance form of the call to a direct call.
+    shift if UNIVERSAL::isa($_[0], __PACKAGE__);
+    # Return the digested string.
+    return Digest::MD5::md5_base64($_[0]);
 }
 
 =head3 ParseFunction
 
-	my ($checksum, $statement, $sep, \%roles, $comment) = $shrub->ParseFunction($function);
-	
+    my ($checksum, $statement, $sep, \%roles, $comment) = $shrub->ParseFunction($function);
+
 or
 
-	my ($checksum, $statement, $sep, \%roles, $comment) = Shrub::ParseFunction($function);
+    my ($checksum, $statement, $sep, \%roles, $comment) = Shrub::ParseFunction($function);
 
 Parse a functional assignment. This method breaks it into its constituent roles,
 pulls out the comment and the separator character, and computes the checksum.
@@ -585,63 +585,63 @@ string.
 =cut
 
 sub ParseFunction {
-	# Convert from the instance form of the call to a direct call.
-	shift if UNIVERSAL::isa($_[0], __PACKAGE__);
-	# Get the parameters.
-	my ($function) = @_;
-	# Separate out the comment (if any).
-	my $statement = $function;
-	my $comment = "";
-	if ($function && $function =~ /(.+?)\s*[#!](.+)/) {
-		($statement, $comment) = ($1, $2);		
-	}
-	# The roles and the separator will go in here.
-	my @roles;
-	my $sep = '@';
-	# This will be the role hash.
-	my %roles;
-	# This will contain the checksum.
-	my $checksum;
-	# Check for suspicious elements.
-	my $malformed;
-	if (! $statement || $statement eq 'hypothetical protein') {
-		# Here we have a hypothetical protein. This is considered well-formed but without
-		# any roles.
-	} elsif ($function =~ /\b(?:similarit|blast\b|fasta|identity)|%|E=/i) {
-		# Here we have suspicious elements.
-		$malformed = 1;
-	} else {
-		# Parse out the roles.
-		my @roleParts = split(/\s*(\s\@|\s\/|;)\s+/, $statement);
-		# Check for a role that is too long.
-		if (grep { length($_) > 250 } @roles) {
-			$malformed = 1;
-		} elsif (scalar(@roleParts) == 1) {
-			# Here we have the normal case, a single-role function.
-			@roles = @roleParts;
-		} else {
-			# With multiple roles, we need to extract the separator and peel out the
-			# roles.
-			$sep = substr($roleParts[1], -1);
-			for (my $i = 0; $i < scalar(@roleParts); $i += 2) {
-				push @roles, $roleParts[$i];
-			}
-		}
-	}
-	# If we are malformed, there are no roles, but we checksum the function.
-	if ($malformed) {
-		$checksum = Checksum($function);
-	} else {
-		# Here we have to compute a checksum from the roles and the separator.
-		my @normalRoles = map { RoleNormalize($_) } @roles;
-		$checksum = Checksum($sep . join("\t", @normalRoles));
-		# Now create the role hash.
-		for (my $i = 0; $i < scalar(@roles); $i++) {
-			$roles{$roles[$i]} = Checksum($normalRoles[$i]);	
-		}
-	}
-	# Return the parsed function data.
-	return ($checksum, $statement, $sep, \%roles, $comment);
+    # Convert from the instance form of the call to a direct call.
+    shift if UNIVERSAL::isa($_[0], __PACKAGE__);
+    # Get the parameters.
+    my ($function) = @_;
+    # Separate out the comment (if any).
+    my $statement = $function;
+    my $comment = "";
+    if ($function && $function =~ /(.+?)\s*[#!](.+)/) {
+        ($statement, $comment) = ($1, $2);
+    }
+    # The roles and the separator will go in here.
+    my @roles;
+    my $sep = '@';
+    # This will be the role hash.
+    my %roles;
+    # This will contain the checksum.
+    my $checksum;
+    # Check for suspicious elements.
+    my $malformed;
+    if (! $statement || $statement eq 'hypothetical protein') {
+        # Here we have a hypothetical protein. This is considered well-formed but without
+        # any roles.
+    } elsif ($function =~ /\b(?:similarit|blast\b|fasta|identity)|%|E=/i) {
+        # Here we have suspicious elements.
+        $malformed = 1;
+    } else {
+        # Parse out the roles.
+        my @roleParts = split(/\s*(\s\@|\s\/|;)\s+/, $statement);
+        # Check for a role that is too long.
+        if (grep { length($_) > 250 } @roles) {
+            $malformed = 1;
+        } elsif (scalar(@roleParts) == 1) {
+            # Here we have the normal case, a single-role function.
+            @roles = @roleParts;
+        } else {
+            # With multiple roles, we need to extract the separator and peel out the
+            # roles.
+            $sep = substr($roleParts[1], -1);
+            for (my $i = 0; $i < scalar(@roleParts); $i += 2) {
+                push @roles, $roleParts[$i];
+            }
+        }
+    }
+    # If we are malformed, there are no roles, but we checksum the function.
+    if ($malformed) {
+        $checksum = Checksum($function);
+    } else {
+        # Here we have to compute a checksum from the roles and the separator.
+        my @normalRoles = map { RoleNormalize($_) } @roles;
+        $checksum = Checksum($sep . join("\t", @normalRoles));
+        # Now create the role hash.
+        for (my $i = 0; $i < scalar(@roles); $i++) {
+            $roles{$roles[$i]} = Checksum($normalRoles[$i]);
+        }
+    }
+    # Return the parsed function data.
+    return ($checksum, $statement, $sep, \%roles, $comment);
 }
 
 
@@ -728,7 +728,7 @@ sub SectionList {
         @retVal = Tracer::GetFile($controlFileName);
     } else {
         # No, so we have to create it. Get the genome repository's directories.
-        my @genomes = grep { $_ =~ /\d+\.\d+/ } Tracer::OpenDir($self->{repository}); 
+        my @genomes = grep { $_ =~ /\d+\.\d+/ } Tracer::OpenDir($self->{repository});
         @retVal = sort @genomes;
         # Append the global section.
         push @retVal, GLOBAL;
@@ -757,7 +757,7 @@ guaranteed to be a single word with only the first letter capitalized.
 
 =item source
 
-The source object used to access the data from which the load file is derived. This 
+The source object used to access the data from which the load file is derived. This
 is the same object returned by L</GetSourceObject>; however, we allow the caller to pass
 it in as a parameter so that we don't end up creating multiple copies of a potentially
 expensive data structure. It is permissible for this value to be undefined, in which

@@ -25,7 +25,7 @@ package ERDBTypeDate;
     use Time::Local qw(timelocal_nocheck);
     use POSIX qw(strftime);
     use base qw(ERDBType);
-    
+
     use constant MONTHS => [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 
 =head1 ERDB Date Type Definition
@@ -393,6 +393,5 @@ sub html {
     # Return the result.
     return $retVal;
 }
-
 
 1;

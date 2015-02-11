@@ -334,5 +334,5 @@ sub LoadTable {
     return $retVal;
 }
 
-1;
 
+1;

@@ -47,10 +47,10 @@ related to the entities will be displayed.
 
 =cut
 
-	$| = 1; # Prevent buffering on STDOUT.
-	# Connect to the database.
-	my ($shrub, $opt) = Shrub->new_for_script('%c %o', {},
-			["entities", "If specified, the name of a file containing a list of entities of interest"]);
+    $| = 1; # Prevent buffering on STDOUT.
+    # Connect to the database.
+    my ($shrub, $opt) = Shrub->new_for_script('%c %o', {},
+            ["entities", "If specified, the name of a file containing a list of entities of interest"]);
     # Create the loader helper object.
     my $loader = ShrubLoader->new($shrub);
     # Get the hash of entities.

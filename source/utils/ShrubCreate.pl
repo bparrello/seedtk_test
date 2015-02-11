@@ -26,7 +26,7 @@
 
     ShrubCreate [options]
 
-This script creates the tables in a new Shrub database.  Any existing data in the tables 
+This script creates the tables in a new Shrub database.  Any existing data in the tables
 will be destroyed. (Tables not normally found in a Shrub database, however, will be unaffected.)
 
 This method always uses an external DBD, ignoring the DBD stored in the database (if any).
@@ -60,19 +60,19 @@ Store the DBD in the database to improve performance.
 
 =cut
 
-	$| = 1; # Prevent buffering on STDOUT.
-	# Connect to the database.
-	my ($shrub, $opt) = Shrub->new_for_script('%c %o', { externalDBD => 1 },
-			["missing|m", "only add missing tables"],
-			["fixup|f", "attempt to fix tables to match the DBD (implies \"missing\")"],
-			["store|s", "store the DBD in the database to improve performance"]);
+    $| = 1; # Prevent buffering on STDOUT.
+    # Connect to the database.
+    my ($shrub, $opt) = Shrub->new_for_script('%c %o', { externalDBD => 1 },
+            ["missing|m", "only add missing tables"],
+            ["fixup|f", "attempt to fix tables to match the DBD (implies \"missing\")"],
+            ["store|s", "store the DBD in the database to improve performance"]);
     # Create the statistics object.
     my $stats = Stats->new();
     print "Database definition taken from " . $shrub->GetMetaFileName() . "\n";
     # Are we storing the DBD?
     if ($opt->store) {
-    	$shrub->InternalizeDBD();
-    	print "Database definition stored in database.\n";
+        $shrub->InternalizeDBD();
+        print "Database definition stored in database.\n";
     }
     # Get the database handle.
     my $dbh = $shrub->{_dbh};
@@ -176,4 +176,3 @@ Store the DBD in the database to improve performance.
     }
     # Tell the user we're done.
     print "Database processed.\n" . $stats->Show();
-

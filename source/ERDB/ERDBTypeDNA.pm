@@ -17,6 +17,7 @@
 # http://www.theseed.org/LICENSE.TXT.
 #
 
+
 package ERDBTypeDNA;
 
     use strict;
@@ -51,7 +52,7 @@ nonstandard characters, such as an ambiguity code or a hyphen.
 
 =cut
 
-use constant MAP => { 
+use constant MAP => {
                       aaa => 'A', aac => 'B', aag => 'C', aat => 'D',
                       aca => 'E', acc => 'F', acg => 'G', act => 'H',
                       aga => 'I', agc => 'J', agg => 'K', agt => 'L',

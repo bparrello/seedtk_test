@@ -17,6 +17,7 @@
 # http://www.theseed.org/LICENSE.TXT.
 #
 
+
 package ERDBTypeLink;
 
     use strict;
