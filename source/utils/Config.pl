@@ -119,7 +119,8 @@ L</WriteAllConfigs> method.
     # Chop off the folder name to get the source root.
     $base_dir =~ s/\/\w+$//;
     # Load in the "Env" module.
-    require "$base_dir/kernel/Env";
+    unshift @INC, "$base_dir/kernel";
+    require Env;
     # Determine the operating system.
     my $winMode = ($^O =~ /Win/ ? 1 : 0);
     # Analyze the command line.
