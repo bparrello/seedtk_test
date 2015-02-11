@@ -22,6 +22,7 @@
     use File::Spec;
     use File::Copy;
     use File::Path;
+    use File::Stat;
     use Getopt::Long::Descriptive;
 
 	# We don't have access to the normal SEEDtk libraries because
@@ -263,6 +264,7 @@ L</WriteAllConfigs> method.
 		}
 		# Write the UConfig.
 		WriteAllConfigs($ucFileName, $base_dir, $opt);
+		print "UConfig file $ucFileName updated.\n";
 		# Now we create the run_perl file in the web directory.  First, we
 		# open the file for output.
 		if (! open(my $oh, ">$FIG_Config::web_dir/run_perl.sh")) {
@@ -278,16 +280,17 @@ L</WriteAllConfigs> method.
 			print $oh "exec perl \"$@\"\n";
 			# Close the output.
 			close $oh;
+			print "Execution helper run_perl.sh created.\n";
 		}
 		if (! $winMode && ! $opt->winmode) {
 			# Here we are on a Unix system and not targeting Windows, so we need to
 			# fix the execution permissions of all the script files.
 			print "Fixing execution permissions.\n";
 			# Fix the web directory permissions.
-			FixPermissions($FIG_Config::web_dir, ".cgi");
+			FixPermissions($FIG_Config::web_dir, ".cgi", 0111);
 			# Fix the permissions of the script directories.
 			for my $scriptDir (@FIG_Config::scripts) {
-				FixPermissions($scriptDir, ".pl");
+				FixPermissions($scriptDir, ".pl", 0111);
 			}
 		}
 	}
@@ -684,4 +687,55 @@ sub BuildPaths {
     	}
     }
 }
+
+=head3 FixPermissions
+
+    FixPermissions($directory, $ext, $mask);
+
+Add the specified permissions to all the files in a directory that match
+a given file extension. The extension should include the separating
+period. So, for example, C<.pl> would match all PERL script files.
+
+=over 4
+
+=item directory
+
+Name of the directory whose files are to be changed.
+
+=item ext
+
+Suffix for the files to be changed. All file names that end in this string
+will be updated.
+
+=item mask
+
+Mask to be merged into the file permission mask. All bits that match the 1 bits
+in this mask will be turned on.
+
+=back
+
+=cut
+
+sub FixPermissions {
+    # Get the parameters.
+    my ($directory, $ext, $mask) = @_;
+    # Open the directory.
+    opendir(my $dh, $directory) || die "Could not open $directory: $!";
+    # Get all the matching files.
+    my $len = length($ext);
+    my @files = grep { substr($_, -$len, $len) eq $ext } readdir($dh);
+    # Close the directory.
+    closedir $dh;
+    # Loop through the files.
+    for my $file (@files) {
+    	# Compose the full file name.
+    	my $fileName = "$directory/$file";
+    	# Compute the new mode.
+    	my $finfo = stat $fileName;
+    	my $newMode = ($finfo->mode & 0777) | $mask;
+    	# Update the file.
+    	chmod $newMode, $fileName;
+    }
+}
+
 
