@@ -741,8 +741,8 @@ sub FixPermissions {
         # Compose the full file name.
         my $fileName = "$directory/$file";
         # Compute the new mode.
-        my $finfo = stat $fileName;
-        my $newMode = ($finfo->[2] & 0777) | $mask;
+        my @finfo = stat $fileName;
+        my $newMode = ($finfo[2] & 0777) | $mask;
         # Update the file.
         chmod $newMode, $fileName;
     }
