@@ -1,4 +1,4 @@
-#!perl -w
+#!/usr/bin/env perl
 
 #
 # Copyright (c) 2003-2006 University of Chicago and Fellowship
@@ -58,7 +58,7 @@ file will be written.
 =item uc
 
 If specified, the name of the UConfig file for the output. If the name is specified
-without a path, it will be put in the main C<config> folder.  If C<off>, no UConfig file
+without a path, it will be put in the parent of the source directory.  If C<off>, no UConfig file
 will be written. If C<sys>, the changes will be made directly to the environment (via
 the registry). This last is only possible under Windows.
 
@@ -130,7 +130,7 @@ L</WriteAllConfigs> method.
             ["fc=s", "name of a file to use for the FIG_Config output, or \"off\" to turn off FIG_Config output",
                     { default => "$base_dir/config/FIG_Config.pm" }],
             ["uc=s", "name of a file to use for the UConfig output, \"off\" to turn off UConfig output, or \"sys\" to write directly to the environment",
-                    { default => "$base_dir/UConfig.sh" }],
+                    { default => "UConfig.sh" }],
             ["apache=s", "location of the Apache configuration files for the testing server"],
             ["dirs", "verify default subdirectories exist"],
             ["pfix=i", "perform PERL path fixup", { default => (1 - $winMode) }],
@@ -256,9 +256,11 @@ L</WriteAllConfigs> method.
         if ($ucFileName ne 'sys') {
             # Fix the slash craziness for Windows.
             $ucFileName =~ tr/\\/\//;
-            # If the name is pathless, put it in the source directory.
+            # If the name is pathless, put it in the source directory's parent.
             if ($ucFileName !~ /\//) {
-                $ucFileName = "$base_dir/$ucFileName";
+                my $ucDir = $base_dir;
+                $ucDir =~ s/\/w+$//;
+                $ucFileName = "$ucDir/$ucFileName";
             }
         }
         # Write the UConfig.
@@ -276,7 +278,7 @@ L</WriteAllConfigs> method.
                 CopyPerlFix($oh, $base_dir);
             }
             # Put in the command to execute PERL.
-            print $oh "exec perl \"$@\"\n";
+            print $oh 'exec perl "$@"' . "\n";
             # Close the output.
             close $oh;
             print "Execution helper run_perl.sh created.\n";

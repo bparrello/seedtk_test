@@ -1,4 +1,4 @@
-#!perl -w
+#!/usr/bin/env perl
 
 #
 # Copyright (c) 2003-2006 University of Chicago and Fellowship
@@ -21,7 +21,7 @@
     use strict;
     use lib '../kernel';
     use Env;
-    
+
     print join("\n", @INC, "");
 
     Env::WriteLines(\*STDOUT, "This is line 1.", "This is line 1");
