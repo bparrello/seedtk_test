@@ -14,4 +14,11 @@
 	<natures>
 		<nature>org.epic.perleditor.perlnature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>UConfig.sh</name>
+			<type>1</type>
+			<location>C:/Users/Bruce/git/SEEDtk/UConfig.sh</location>
+		</link>
+	</linkedResources>
 </projectDescription>

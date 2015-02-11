@@ -517,9 +517,9 @@ sub WriteAllConfigs {
         # Change to the SEEDtk directory.
         my $rootDir = $base_dir;
         $rootDir =~ s/\/source$//;
-        print $oh "cd $rootDir";
+        print $oh "cd $rootDir\n";
         # Fix up the prompt
-        print $oh 'PS1\"\h-\W$ "' . "\n";
+        print $oh 'PS1="\h-\W$ "' . "\n";
     }
     # The file (or registry key) in $oh will close automatically when we go out of scope.
 }
