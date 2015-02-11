@@ -409,7 +409,7 @@ sub WriteAllParams {
     print $oh "package FIG_Config;\n";
     Env::WriteLines($oh,
         "",
-        "## WHEN YOU ADD ITEMS TO THIS FILE, BE SURE TO UPDATE utils/Configure.pl.",
+        "## WHEN YOU ADD ITEMS TO THIS FILE, BE SURE TO UPDATE source/utils/Config.pl.",
         "## All paths should be absolute, not relative.",
         "");
     # Write each parameter.
