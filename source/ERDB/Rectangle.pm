@@ -22,7 +22,6 @@ package Rectangle;
     use strict;
     use Tracer;
 
-
 =head1 Rectangular Region Object
 
 =head2 Introduction
@@ -86,7 +85,7 @@ sub new {
     # Get the parameters.
     my ($class, $left, $top, $right, $bottom) = @_;
     # Create the Rectangle object.
-    my $retVal = { 
+    my $retVal = {
                     left => $left,
                     right => $right,
                     top => $top,

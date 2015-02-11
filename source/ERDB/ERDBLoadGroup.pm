@@ -141,7 +141,7 @@ A list of the names for the tables in this load group.
 sub new {
     # Get the parameters.
     my ($class, $db, $options, @tables) = @_;
-    # Create a statistics object 
+    # Create a statistics object
     my $stats = Stats->new();
     # Compute the group name from the class name. It is the first word in
     # a name that is presumably capital case.
@@ -153,7 +153,7 @@ sub new {
     # defined and the section has not yet been assigned. The "ProcessSection"
     # method is used to assign the section, and the loaders are created the first
     # time it's called.
-    my $retVal = { 
+    my $retVal = {
                     db => $db,
                     directory => $directory,
                     group => $group,
@@ -860,7 +860,7 @@ terminate itself at the end of the current section.
 
 =item erdb
 
-Database 
+Database
 
 =item directory (optional)
 
@@ -1018,5 +1018,6 @@ or an undefined value if nothing happened.
 =cut
 
 sub PostProcess { }
+
 
 1;

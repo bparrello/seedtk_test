@@ -20,13 +20,13 @@ eval {
     # Get the structure.
     my $retVal;
     if ($struct eq 'Shrub DBD') {
-    	$retVal = Shrub->new(offline => 1);
+        $retVal = Shrub->new(offline => 1);
     } elsif ($struct eq 'Shrub Object') {
-    	$retVal = Shrub->new();
+        $retVal = Shrub->new();
     } elsif ($struct eq 'TEST') {
-    	$retVal = TestMethod::TestMethod();
+        $retVal = TestMethod::TestMethod();
     } else {
-    	die "Unknown structure requested."
+        die "Unknown structure requested."
     }
     # Dump the result.
     print CGI::start_div({ id => 'Dump' });
@@ -37,5 +37,6 @@ if ($@) {
     print CGI::blockquote($@);
 }
 print CGI::end_html();
+
 
 1;

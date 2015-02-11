@@ -16,10 +16,6 @@
 # http://www.theseed.org/LICENSE.TXT.
 ########################################################################
 
-#
-# This is a SAS component
-#
-
 package DBKernel;
 
 use strict;
@@ -104,20 +100,20 @@ sub new {
     if ($dbms eq "mysql")
     {
         if ($dbhost)
-	{
-	    push(@opts, "hostname=$dbhost");
-	}
-	if ($dbsock)
-	{
-	    push(@opts, "mysql_socket=$dbsock");
-	}
+    {
+        push(@opts, "hostname=$dbhost");
+    }
+    if ($dbsock)
+    {
+        push(@opts, "mysql_socket=$dbsock");
+    }
     }
     elsif ($dbms eq "Pg")
     {
-	if (defined($dbhost))
-	{
-	    push(@opts, "host=$dbhost");
-	}
+    if (defined($dbhost))
+    {
+        push(@opts, "host=$dbhost");
+    }
     }
 
 
@@ -135,20 +131,20 @@ sub new {
     # Now connect to the database.
     my $data_source;
     if ($dbname =~ /^DBI:/) {
-    	$data_source = $dbname;
+        $data_source = $dbname;
     } else {
-    	my $opts = join(";", @opts);
-    	$data_source = "DBI:$dbms(AutoCommit => 1):dbname=$dbname;$opts";
+        my $opts = join(";", @opts);
+        $data_source = "DBI:$dbms(AutoCommit => 1):dbname=$dbname;$opts";
     }
     Trace("Connect string is: $data_source") if T(3);
     my $dbh = Connect($data_source, $dbuser, $dbpass, $dbms);
     bless {
-	_connect => [$data_source, $dbuser, $dbpass],
+    _connect => [$data_source, $dbuser, $dbpass],
         _dbh => $dbh,
         _dbms => $dbms,
         _preIndex => $preload,
         _host => ($dbhost || "localhost"),
-	_retries => 0,
+    _retries => 0,
     }, $class;
 }
 
@@ -200,7 +196,7 @@ sub Connect {
         $retVal->do(qq(SET DATESTYLE TO Postgres,US));
     } elsif ($dbms eq "SQLite") {
         $retVal->do("pragma synchronous = OFF;");
-	$retVal->{sqlite_see_if_its_a_number} = 1;
+    $retVal->{sqlite_see_if_its_a_number} = 1;
     } elsif ($dbms eq "mysql") {
         $retVal->{mysql_auto_reconnect} = 1;
     }
@@ -249,7 +245,7 @@ sub test_mode {
     $self->{testFlag} = 1;
     # If we're mySQL, turn off the query cache.
     if ($self->{_dbms} eq 'mysql') {
-	$self->{_dbh}->do("SET SESSION query_cache_type = OFF");
+    $self->{_dbh}->do("SET SESSION query_cache_type = OFF");
     }
 }
 
@@ -682,7 +678,7 @@ sub get_tables {
 
     if (ref($self->{table_cache}) eq "ARRAY")
     {
-	return @{$self->{table_cache}};
+    return @{$self->{table_cache}};
     }
 
     my $dbh = $self->{_dbh};
@@ -697,24 +693,24 @@ sub get_tables {
     my @ret;
     if ($self->{_dbms} eq 'mysql')
     {
-	@ret =  map {
-	    if ($quote)
-	    {
-		if (/^($quote[^$quote]*$quote\.)?$quote([^$quote]*)$quote/)
-		{
-		    $2;
-		}
-		else
-		{
-		    $_;
-		}
-	    }
-	    else
-	    {
-		s/^[^.]+\.//;
-		$_;
-	    }
-	   } @tables;
+    @ret =  map {
+        if ($quote)
+        {
+        if (/^($quote[^$quote]*$quote\.)?$quote([^$quote]*)$quote/)
+        {
+            $2;
+        }
+        else
+        {
+            $_;
+        }
+        }
+        else
+        {
+        s/^[^.]+\.//;
+        $_;
+        }
+       } @tables;
     }
     elsif ($self->{_dbms} eq 'Pg') {
         for my $table (@tables) {
@@ -727,7 +723,7 @@ sub get_tables {
     }
     else
     {
-	@ret =  map { $quote ne "" && s/^$quote(.*?)$quote$/$1/; s/^[^.]+\.//; $_ } @tables;
+    @ret =  map { $quote ne "" && s/^$quote(.*?)$quote$/$1/; s/^[^.]+\.//; $_ } @tables;
     }
 
     $self->{table_cache} = [@ret];
@@ -979,17 +975,17 @@ sub create_table {
 
     if ($self->{_dbms} eq "mysql")
     {
-	if (not $FIG_Config::mysql_v3)
-	{
-	    $options = " DEFAULT CHARSET latin1 COLLATE latin1_bin";
-	}
+    if (not $FIG_Config::mysql_v3)
+    {
+        $options = " DEFAULT CHARSET latin1 COLLATE latin1_bin";
+    }
          if (defined $arg{estimates} && !defined($FIG_Config::disable_dbkernel_size_estimates)) {
              my ($rowSize, $rowCount) = @{$arg{estimates}};
- 	    if (not $FIG_Config::mysql_v3)
- 	    {
- 	        my $engine = $FIG_Config::default_mysql_engine || 'MyISAM';
- 		$options .= " ENGINE = $engine";
- 	    }
+         if (not $FIG_Config::mysql_v3)
+         {
+             my $engine = $FIG_Config::default_mysql_engine || 'MyISAM';
+         $options .= " ENGINE = $engine";
+         }
              $options .= " AVG_ROW_LENGTH = $rowSize MAX_ROWS = $rowCount";
         }
     }
@@ -1037,7 +1033,7 @@ table while the load is in progress.
 =item dup (optional)
 
 If C<ignore>, duplicate rows are discarded automatically; if C<replace>, duplicate rows
-replace the previous instance. If omitted, duplicate rows cause an error. 
+replace the previous instance. If omitted, duplicate rows cause an error.
 
 =item RETURN
 
@@ -1063,7 +1059,7 @@ sub load_table {
     my $rv;
     # Convert "normal" load mode to null.
     if ($style eq 'normal') {
-	$style = '';
+    $style = '';
     }
     if ($file) {
         if ($dbms eq "mysql") {
@@ -1077,15 +1073,15 @@ sub load_table {
             # Decide whether we are ignoring duplicates.
             my $ignore_mode = "";
             if ($arg{dup}) {
-            	$ignore_mode = uc $arg{dup};
+                $ignore_mode = uc $arg{dup};
             }
-	    	my $sql = "LOAD DATA $style $local INFILE '$file' $ignore_mode INTO TABLE $tbl FIELDS TERMINATED BY '$delim';";
-	    	Trace("SQL command: $sql") if T(SQL => 2);
+            my $sql = "LOAD DATA $style $local INFILE '$file' $ignore_mode INTO TABLE $tbl FIELDS TERMINATED BY '$delim';";
+            Trace("SQL command: $sql") if T(SQL => 2);
             $rv = $dbh->do($sql);
         } elsif ($dbms eq "Pg") {
             Trace("Loading $tbl into PostGres using file $file.") if T(2);
-	    my $sql = "COPY $tbl FROM '$file' WITH DELIMITER '$delim' NULL AS '\\N';";
-	    Trace("SQL command: $sql") if T(SQL => 2);
+        my $sql = "COPY $tbl FROM '$file' WITH DELIMITER '$delim' NULL AS '\\N';";
+        Trace("SQL command: $sql") if T(SQL => 2);
             $rv = $dbh->do($sql);
         }
         elsif ($dbms eq 'SQLite')
@@ -1223,7 +1219,7 @@ sub create_index {
     my $uniqueFlag = ($arg{kind} ? "$arg{kind}" : "");
     # If this is SQLite, fix the field list.
     if ($dbms eq "SQLite") {
-	$flds =~ s/\(\d+\)//g;
+    $flds =~ s/\(\d+\)//g;
     }
     # Build the create command.
     my $cmd;
@@ -1300,7 +1296,7 @@ sub drop_index {
     }
     else
     {
-	Confess "Attempting drop_index on unsupported database $dbms\n";
+    Confess "Attempting drop_index on unsupported database $dbms\n";
     }
     return $res;
 }
@@ -1338,10 +1334,10 @@ Name of the SQL table to truncate.
 sub truncate_table {
     my ($self, $tableName) = @_;
     if ($self->{_dbms} eq 'SQLite') {
-	$self->SQL("DELETE FROM $tableName");
-	$self->SQL("VACUUM");
+    $self->SQL("DELETE FROM $tableName");
+    $self->SQL("VACUUM");
     } else {
-	$self->SQL("TRUNCATE TABLE $tableName");
+    $self->SQL("TRUNCATE TABLE $tableName");
     }
 }
 
@@ -1553,11 +1549,11 @@ sub reload_table {
     eval {
         # If we're in ALL mode, we drop and re-create the table. Otherwise,
         # we delete the obsolete objects.
-	#
-	# Before deleting the obsolete objs, we need to see if the table already exists.
-	# We could have  updated the code such that we are now doing a reload on a
-	# portion of a table that we haven't made yet.
-	#
+    #
+    # Before deleting the obsolete objs, we need to see if the table already exists.
+    # We could have  updated the code such that we are now doing a reload on a
+    # portion of a table that we haven't made yet.
+    #
 
         if ( $mode eq 'all') {
             Trace("Recreating $table.") if T(Load => 2);
@@ -1567,7 +1563,7 @@ sub reload_table {
             if ($self->{_preIndex}) {
                 $self->create_indexes($table, $xflds);
             }
-	} elsif (not $self->table_exists($table)) {
+    } elsif (not $self->table_exists($table)) {
             $self->create_table( tbl  => $table, flds => $flds, estimates => $estimates );
             # For pre-indexed DBMSs, we want to create the indexes here.
             if ($self->{_preIndex}) {
@@ -1679,7 +1675,7 @@ sub finish_load {
 
     if (!$ENV{DBKERNEL_DEFER_VACUUM})
     {
-	$self->vacuum_it($table);
+    $self->vacuum_it($table);
     }
 }
 
@@ -1793,16 +1789,16 @@ sub flush_tables {
 
 =head3 quote
 
-	my $q = $db->quote();
+    my $q = $db->quote();
 
 Return the quote character used by this DBMS.
 
 =cut
 
 sub quote {
-	my ($self) = @_;
-	my $dbh = $self->{_dbh};
-	return $dbh->get_info(29) || "";
+    my ($self) = @_;
+    my $dbh = $self->{_dbh};
+    return $dbh->get_info(29) || "";
 }
 
 =head3 estimate_table_size

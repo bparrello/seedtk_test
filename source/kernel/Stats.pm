@@ -3,9 +3,6 @@ package Stats;
     use strict;
     use Carp;
 
-#
-# This is a SAS component
-#
 
 =head1 Statistical Reporting Object
 

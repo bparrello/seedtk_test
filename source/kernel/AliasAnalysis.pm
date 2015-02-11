@@ -635,5 +635,4 @@ sub AnalyzeClearinghouseArray {
     return @retVal;
 }
 
-
 1;

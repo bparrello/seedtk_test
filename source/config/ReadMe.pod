@@ -40,16 +40,16 @@ The structural information about the SEEDtk environment is kept in the L<FIG_Con
 in the B<config> directory. You can add new PERL library folders by putting them in the
 B<@plibs> variable and new script folders by putting them in the B<@pscripts> variable.
 After changing the FIG_Config, run the L<Configure.pl> script with the C<--fc=off> option,
-which will update the environment script C<Uconfig.sh>. After updating this script, 
+which will update the environment script C<Uconfig.sh>. After updating this script,
 you will need to restart your shell and do another
 
-	source UConfig.sh
+  source UConfig.sh
 
 command.
 
 In Windows, you can direct L<Configure.pl> to write environment information to the
 system registry. If this is the case, you must reboot the system to access the
-new environment. 
+new environment.
 
 =head2 The Data Directory
 
@@ -130,11 +130,11 @@ First, you need a user name and password on GITHUB, and it must be an authorized
 repository.
 
 Position in your home directory. In the examples below, it will be assumed your user name is C<username>. Simply
-substitute your real username when typing the commands. 
+substitute your real username when typing the commands.
 
 Clone the repository using GIT.
 
-	git clone https://username@github.com/bparrello/seedtk_test.git SEEDtk
+    git clone https://username@github.com/bparrello/seedtk_test.git SEEDtk
 
 You will be prompted for a password. A new directory C<SEEDtk> will be created at the current
 location and the SEEDtk files will be loaded into it.
@@ -142,23 +142,23 @@ location and the SEEDtk files will be loaded into it.
 At this point I recommend changing to the SEEDtk directory, as it simplifies most of the paths
 you'll have to type.
 
-	cd SEEDtk
+    cd SEEDtk
 
 The next step is to create a data directory. You can create your own private data directory or you
 can use an existing one. For this example, we'll create a private one right under SEEDtk and make
 it writable by the FIG group.
 
-	mkdir Data
-	chmod g+ws Data
-	chgrp fig Data
+    mkdir Data
+    chmod g+ws Data
+    chgrp fig Data
 
 Now we need to get access to the correct version of PERL. To do this, you type
 
-	source source/config/PerlPath.sh
+    source source/config/PerlPath.sh
 
 We are now ready to bootstrap the system using the L<Config.pl> script. Type
 
-	perl source/utils/Config.pl --dirs --links --home=/homes/self/public_html Data Web
+    perl source/utils/Config.pl --dirs --links --home=/homes/self/public_html Data Web
 
 Here C<Data> should be your data directory, and C</homes/self/public_html> the path to a web-addressable
 directory, usually C<public_html> in your home directory.
@@ -167,14 +167,8 @@ The L<Config.pl> script is one you will use frequently to insure your environmen
 but once the environment is active you will not need to type so many options. Most of the time
 you'll just enter
 
-	Config
+    Config
 
 directly and everything will be fixed up automatically. You will not need to do this every time you
 change the code, only when you add a new script, update L<FIG_Config>, or an environment change is
 made to the system as a whole.
-
-
-
-
-
-

@@ -2,12 +2,12 @@ package Env;
 
     use strict;
     use File::Spec;
-    
+
     # This prevents a compiler warning for the registry stuff if we end up
     # not loading Win32::Registry.
-	package main {
-   		use vars qw($HKEY_LOCAL_MACHINE $HKEY_CURRENT_USER $HKEY_CLASSES_ROOT);
-	}
+    package main {
+           use vars qw($HKEY_LOCAL_MACHINE $HKEY_CURRENT_USER $HKEY_CLASSES_ROOT);
+    }
 
 =head1 Environment Modification Utilities
 
@@ -26,7 +26,7 @@ identical between the two environments.
 
 =head3 GetRegKey
 
-	my $keyStructure = Environment->GetRegKey($root => $path);
+    my $keyStructure = Environment->GetRegKey($root => $path);
 
 Return a L<Win32::Registry> structure for manipulating the values of a
 particular registry key.
@@ -46,36 +46,36 @@ backslashes C<\> can be used as delimiters between path segments.
 
 =item RETURN
 
-Returns a L<Win32::Registry> object for manipulating the key in question.  
+Returns a L<Win32::Registry> object for manipulating the key in question.
 
 =back
 
 =cut
 
 sub GetRegKey {
-	# Get the parameters.
-	my ($class, $root, $path) = @_;
-	# Insure we have access to the registry stuff.
-	require Win32::Registry;
-	# Get the root variable.
-	my $rootKey;
-	if ($root eq 'HKLM') {
-		$rootKey = $::HKEY_LOCAL_MACHINE;
-	} elsif ($root eq 'HKCR') {
-		$rootKey = $::HKEY_CLASSES_ROOT;
-	} elsif ($root = 'HKCU') {
-		$rootKey = $::HKEY_CURRENT_USER;
-	}
-	# Normalize the path. We convert slashes to backslashes and insure there is one at the end.
-	$path =~ tr/\//\\/;
-	if (substr($path, -1) ne "\\") {
-		$path .= "\\";
-	}
-	# Ask for the registry key.
-	my $retVal;
-	$rootKey->Open($path, $retVal);
-	# Return it to the caller.
-	return $retVal;
+    # Get the parameters.
+    my ($class, $root, $path) = @_;
+    # Insure we have access to the registry stuff.
+    require Win32::Registry;
+    # Get the root variable.
+    my $rootKey;
+    if ($root eq 'HKLM') {
+        $rootKey = $::HKEY_LOCAL_MACHINE;
+    } elsif ($root eq 'HKCR') {
+        $rootKey = $::HKEY_CLASSES_ROOT;
+    } elsif ($root = 'HKCU') {
+        $rootKey = $::HKEY_CURRENT_USER;
+    }
+    # Normalize the path. We convert slashes to backslashes and insure there is one at the end.
+    $path =~ tr/\//\\/;
+    if (substr($path, -1) ne "\\") {
+        $path .= "\\";
+    }
+    # Ask for the registry key.
+    my $retVal;
+    $rootKey->Open($path, $retVal);
+    # Return it to the caller.
+    return $retVal;
 }
 
 =head2 Environment Query Methods
@@ -120,35 +120,35 @@ sub GetFigConfigs {
     my @comments;
     # Loop through the file.
     while (! eof $ih) {
-    	my $line = <$ih>;
-    	# Determine the line type.
-    	if ($line =~ /^\s*#\s*(.*)/) {
-    		# Here we have a comment line. Accumulate it in the comment list.
-    		push @comments, $1;
-    	} elsif ($line =~ /^\s*our\s+([\$|\@])(\w+)\s*=/) {
-    		# Here we have an assignment. Save the variable name and type.
-    		my ($varType, $varName) = ($1, $2);
-    		# Create the comment.
-    		my $comment = join(" ", @comments);
-    		# Form the full name of the variable.
-    		my $fullName = $varType . 'FIG_Config::' . $varName;
-    		# Convert it into an expression for the variable value. We only
-    		# need to do this for lists.
-    		if ($varType eq '@') {
-    			$fullName = '"(" . join(", ", ' . $fullName . ') . ")"';
-    		}
-    		# Get the desired value.
-    		my $value = eval($fullName);
-    		if ($@) {
-    			die "Error evaluating $varName: $@";
-    		}
-    		# Store the information about this variable in the hash.
-    		$retVal{"$varType$varName"} = [$comment, $value];
-    	} else {
-    		# Here we have a separator line. We must clear the
-    		# comment list.
-    		@comments = ();
-    	}
+        my $line = <$ih>;
+        # Determine the line type.
+        if ($line =~ /^\s*#\s*(.*)/) {
+            # Here we have a comment line. Accumulate it in the comment list.
+            push @comments, $1;
+        } elsif ($line =~ /^\s*our\s+([\$|\@])(\w+)\s*=/) {
+            # Here we have an assignment. Save the variable name and type.
+            my ($varType, $varName) = ($1, $2);
+            # Create the comment.
+            my $comment = join(" ", @comments);
+            # Form the full name of the variable.
+            my $fullName = $varType . 'FIG_Config::' . $varName;
+            # Convert it into an expression for the variable value. We only
+            # need to do this for lists.
+            if ($varType eq '@') {
+                $fullName = '"(" . join(", ", ' . $fullName . ') . ")"';
+            }
+            # Get the desired value.
+            my $value = eval($fullName);
+            if ($@) {
+                die "Error evaluating $varName: $@";
+            }
+            # Store the information about this variable in the hash.
+            $retVal{"$varType$varName"} = [$comment, $value];
+        } else {
+            # Here we have a separator line. We must clear the
+            # comment list.
+            @comments = ();
+        }
     }
     # Return the result.
     return \%retVal;
@@ -156,8 +156,8 @@ sub GetFigConfigs {
 
 =head3 GetScripts
 
-	my $scriptHash = Env::GetScripts($dir);
-	
+    my $scriptHash = Env::GetScripts($dir);
+
 Return a hash of the script files in each directory.
 
 =over 4
@@ -176,36 +176,36 @@ POD documentation.
 =cut
 
 sub GetScripts {
-	# Get the parameters.
-	my ($dir) = @_;
-	# Declear the return variable.
-	my %retVal;
-	# Open the directory.
+    # Get the parameters.
+    my ($dir) = @_;
+    # Declear the return variable.
+    my %retVal;
+    # Open the directory.
     opendir(my $dh, $dir) || die "Could not open directory $dir: $!";
     # Find all the script files.
     my @files = grep { $_ =~ /^\w+\.pl$/ } readdir($dh);
     close $dh;
     # Loop through the file names.
     for my $file (@files) {
-    	# Open this file for input.
-    	if (! open(my $ih, "<$dir/$file")) {
-    		# Here the open failed. Store the error message.
-    		$retVal{$file} = "Error reading file: $!";
-    	} else {
-    		# We opened the file. Look for the heading comment.
-    		my $comment;
-    		while (! eof $ih && ! $comment) {
-    			my $line = <$ih>;
-    			if ($line =~ /^=head1\s+(.+)/) {
-    				$comment = $1;
-    			}
-    		}
-    		# Put the comment (or undef if there was none) in the hash.
-   			$retVal{$file} = $comment;
-    	}
+        # Open this file for input.
+        if (! open(my $ih, "<$dir/$file")) {
+            # Here the open failed. Store the error message.
+            $retVal{$file} = "Error reading file: $!";
+        } else {
+            # We opened the file. Look for the heading comment.
+            my $comment;
+            while (! eof $ih && ! $comment) {
+                my $line = <$ih>;
+                if ($line =~ /^=head1\s+(.+)/) {
+                    $comment = $1;
+                }
+            }
+            # Put the comment (or undef if there was none) in the hash.
+               $retVal{$file} = $comment;
+        }
     }
-	# Return the hash.
-	return \%retVal;
+    # Return the hash.
+    return \%retVal;
 }
 
 
@@ -213,7 +213,7 @@ sub GetScripts {
 
 =head3 BuildPathList
 
-	my $pathString = Env::BuildPathList($winMode, $delim, @paths);
+    my $pathString = Env::BuildPathList($winMode, $delim, @paths);
 
 Build a string that contains a list of file paths. The file paths will be
 normalized into the appropriate form based on the target operating system.
@@ -241,27 +241,27 @@ Returns a delimited list of the path strings.
 =cut
 
 sub BuildPathList {
-	# Get the parameters.
-	my ($winMode, $delim, @paths) = @_;
-	# The normalized paths will be put in here.
-	my @normals;
-	for my $path (@paths) {
-		# Is this Windows?
-		if ($winMode) {
-			# Yes. Convert the slashes.
-			$path =~ tr/\//\\/;
-			# Insure we have a drive letter.
-			if ($path !~ /^\w:/) {
-				$path = "C:$path";
-			}
-		}
-		# Save the modified path.
-		push @normals, $path;
-	}
-	# Form the result string.
-	my $retVal = join($delim, @normals);
-	# Return it.
-	return $retVal;
+    # Get the parameters.
+    my ($winMode, $delim, @paths) = @_;
+    # The normalized paths will be put in here.
+    my @normals;
+    for my $path (@paths) {
+        # Is this Windows?
+        if ($winMode) {
+            # Yes. Convert the slashes.
+            $path =~ tr/\//\\/;
+            # Insure we have a drive letter.
+            if ($path !~ /^\w:/) {
+                $path = "C:$path";
+            }
+        }
+        # Save the modified path.
+        push @normals, $path;
+    }
+    # Form the result string.
+    my $retVal = join($delim, @normals);
+    # Return it.
+    return $retVal;
 }
 
 
@@ -291,12 +291,12 @@ sub WriteLines {
     my ($oh, @lines) = @_;
     # Loop through the lines.
     for my $line (@lines) {
-    	# If the line is nonblank, pad it on the left.
-    	if ($line =~ /\S/) {
-    		$line = "    $line";
-    	}
-    	# Write the line.
-    	print $oh "$line\n";
+        # If the line is nonblank, pad it on the left.
+        if ($line =~ /\S/) {
+            $line = "    $line";
+        }
+        # Write the line.
+        print $oh "$line\n";
     }
 }
 
@@ -333,9 +333,9 @@ Value to assign to the variable if it does not already have one.
 
     # Table for escaping quoted strings.
     use constant BACKSLASH => { ( map { $_ => "\\$_" } ( '\\', '"', '$', '@' ) ),
-								( map { chr($_) => "\\x" . unpack('H2', chr($_)) } (0..31, 128..255) ),
-								( "\r" => "\\r", "\n" => "\\n", "\t" => "\\t")
-    						  };
+                                ( map { chr($_) => "\\x" . unpack('H2', chr($_)) } (0..31, 128..255) ),
+                                ( "\r" => "\\r", "\n" => "\\n", "\t" => "\\t")
+                              };
 
 sub WriteParam {
     # Get the parameters.
@@ -343,20 +343,20 @@ sub WriteParam {
     # We will put the desired variable value in here.
     my $value = eval("\$FIG_Config::$varName");
     if ($@) {
-    	die "Error checking value of FIG_Config::$varName";
+        die "Error checking value of FIG_Config::$varName";
     }
     if (! defined $value) {
-    	# There is no existing value, so use the default.
-    	$value = $defaultValue;
+        # There is no existing value, so use the default.
+        $value = $defaultValue;
     }
     # Convert the value to PERL.
     if ($value !~ /^\d+$/) {
-    	# Here the value is not a number. Convert it to backslashed form and quote it.
-    	my @output = ('"');
-    	for my $ch (split //, $value) {
-    		push @output, (BACKSLASH->{$ch} // $ch);
-    	}
-    	$value = join("", @output, '"');
+        # Here the value is not a number. Convert it to backslashed form and quote it.
+        my @output = ('"');
+        for my $ch (split //, $value) {
+            push @output, (BACKSLASH->{$ch} // $ch);
+        }
+        $value = join("", @output, '"');
     }
     # Create the list of comment lines. First, we split the comment
     # into words.
@@ -365,13 +365,13 @@ sub WriteParam {
     my @comments = ("#");
     my $i = 0;
     for my $word (@words) {
-    	if (length($comments[$i]) + length($word) > 60) {
-    		$comments[++$i] = "# $word";
-    	} else {
-    		$comments[$i] .= " $word";
-    	}
+        if (length($comments[$i]) + length($word) > 60) {
+            $comments[++$i] = "# $word";
+        } else {
+            $comments[$i] .= " $word";
+        }
     }
-    
+
     # Write a blank line followed by the parameter's comments and value.
     WriteLines($oh, "", @comments, "our \$$varName = $value;");
 }
@@ -379,7 +379,7 @@ sub WriteParam {
 
 =head3 WriteConfig
 
-	Env::WriteConfig($oh, $comment, $varName, $value, %options);
+    Env::WriteConfig($oh, $comment, $varName, $value, %options);
 
 Write a configuration parameter. This may involve output to a file or
 an update to the registry environment. Because we use a bash emulator
@@ -416,7 +416,7 @@ are supported.
 If specified, the value is presumed to be a list that is merged into the
 configuration. The value of the option is the list delimiter. In the
 registry update case, this is an imperfect system, since if the
-values to be merged change, old data could be left behind. 
+values to be merged change, old data could be left behind.
 
 =item expanded
 
@@ -430,48 +430,49 @@ stored in the registry. Expanded strings allow %-variable substitution.
 =cut
 
 sub WriteConfig {
-	# Get the parameters.
-	my ($oh, $comment, $varName, $value, %options) = @_;
-	# Check for a merge delimiter.
-	my $delim = $options{merge};
-	# Determine whether this is a registry update or a write.
-	if (ref $oh ne 'Win32::Registry') {
-		# Here we have an output file.
-		# Write the comment.
-		print $oh "# $comment\n";
-		# Is this a merge?
-		if ($delim) {
-			# Yes. Write a command to prefix the new information.
-			print $oh "$varName=\"$value$delim\$$varName\"\n";
-			print $oh "export $varName\n";
-		} else {
-			# No. Write a command to store the new information.
-			print $oh "$varName=\"$value\"\n";
-			print $oh "export $varName\n";
-		}
-	} else {
-		# Here we have a registry update. There is no comment. We'll
-		# put the target value in here.
-		my $actualValue = $value;
-		# If this is a merge, we need to parse the existing value and
-		# merge the new values in;
-		if ($delim) {
-			# Parse the incoming value.
-			my %items = map { $_ => 1 } split $delim, $value;
-			# Get the current environment value and parse it as well,
-			# removing values found in @items.
-			my @current = grep { ! $items{$_} } split $delim, $ENV{$varName};
-			# Form a new value.
-			$actualValue = join($delim, $value, @current);
-		}
-		# Determine the type of string being stored. 2 = expanded string,
-		# 1 = string.
-		my $type = ($options{expanded} ? 2 : 1);
-		# Store the new value in the registry. The 0 in the parameter list
-		# is a weird reserved parameter that has no effect but is still
-		#required.
-		$oh->SetValueEx($varName, 0, $type, $actualValue);
-	}
+    # Get the parameters.
+    my ($oh, $comment, $varName, $value, %options) = @_;
+    # Check for a merge delimiter.
+    my $delim = $options{merge};
+    # Determine whether this is a registry update or a write.
+    if (ref $oh ne 'Win32::Registry') {
+        # Here we have an output file.
+        # Write the comment.
+        print $oh "# $comment\n";
+        # Is this a merge?
+        if ($delim) {
+            # Yes. Write a command to prefix the new information.
+            print $oh "$varName=\"$value$delim\$$varName\"\n";
+            print $oh "export $varName\n";
+        } else {
+            # No. Write a command to store the new information.
+            print $oh "$varName=\"$value\"\n";
+            print $oh "export $varName\n";
+        }
+    } else {
+        # Here we have a registry update. There is no comment. We'll
+        # put the target value in here.
+        my $actualValue = $value;
+        # If this is a merge, we need to parse the existing value and
+        # merge the new values in;
+        if ($delim) {
+            # Parse the incoming value.
+            my %items = map { $_ => 1 } split $delim, $value;
+            # Get the current environment value and parse it as well,
+            # removing values found in @items.
+            my @current = grep { ! $items{$_} } split $delim, $ENV{$varName};
+            # Form a new value.
+            $actualValue = join($delim, $value, @current);
+        }
+        # Determine the type of string being stored. 2 = expanded string,
+        # 1 = string.
+        my $type = ($options{expanded} ? 2 : 1);
+        # Store the new value in the registry. The 0 in the parameter list
+        # is a weird reserved parameter that has no effect but is still
+        #required.
+        $oh->SetValueEx($varName, 0, $type, $actualValue);
+    }
 }
+
 
 1;
