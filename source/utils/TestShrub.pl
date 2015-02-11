@@ -19,7 +19,6 @@
 
 
     use strict;
-    use lib '../kernel';
     use Env;
 
     print join("\n", @INC, "");

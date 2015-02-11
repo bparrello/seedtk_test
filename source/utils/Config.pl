@@ -17,8 +17,6 @@
 # http://www.theseed.org/LICENSE.TXT.
 #
 
-##TODO: can we fix the DocumentRoot problem?
-##TODO: add a test script that displays roles with EC numbers.
 
     use strict;
     use File::Basename;
@@ -514,10 +512,15 @@ sub WriteAllConfigs {
     my $libs = Env::BuildPathList($opt->winmode, $delim, @FIG_Config::libs);
     Env::WriteConfig($oh, "Add SEEDtk libraries to the PERL library path.", PERL5LIB => $libs, merge => $delim);
     ## Put new configuration parameters here.
-    # Change to the SEEDtk directory.
-    my $rootDir = $base_dir;
-    $rootDir =~ s/\/source$//;
-    print $oh "cd $rootDir";
+    # This next section is for shell scripts only.
+    if (ref $oh eq 'GLOB') {
+        # Change to the SEEDtk directory.
+        my $rootDir = $base_dir;
+        $rootDir =~ s/\/source$//;
+        print $oh "cd $rootDir";
+        # Fix up the prompt
+        print $oh 'PS1\"\h-\W$"' . "\n";
+    }
     # The file (or registry key) in $oh will close automatically when we go out of scope.
 }
 
