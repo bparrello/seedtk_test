@@ -25,9 +25,9 @@
     use Getopt::Long::Descriptive;
 
 	# We don't have access to the normal SEEDtk libraries because
-	# we are still bootstrapping. We update @INC get
-	# addressability to the kernel packages.    
-    BEGIN { push @INC, '../kernel'; }
+	# we are still bootstrapping, so we have to pull in the
+	# kernel libraries explicitly.    
+    use lib '../kernel';
     use Env;
 
 	# We need to look inside the FIG_Config even though it is loaded at

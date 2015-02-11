@@ -19,15 +19,9 @@
 
 
     use strict;
-    use Stats;
-    use SeedUtils;
-    use Shrub;
-    use Tracer;
+    use lib '../kernel';
     use Env;
-    use FIG_Config;
+    
+    print join("\n", @INC, "");
 
-	my $hash = Env::GetScripts("/Users/Bruce/git/SEEDtk/source/utils");
-	my $frog;
-	my $test = $frog . "123";
-	print "$test Done\n";
-
+	Env::WriteLines(\*STDOUT, "This is line 1.", "This is line 1");
