@@ -3,11 +3,6 @@ package Env;
     use strict;
     use File::Spec;
 
-    # This prevents a compiler warning for the registry stuff if we end up
-    # not loading Win32::Registry.
-    package main {
-           use vars qw($HKEY_LOCAL_MACHINE $HKEY_CURRENT_USER $HKEY_CLASSES_ROOT);
-    }
 
 =head1 Environment Modification Utilities
 
@@ -53,18 +48,24 @@ Returns a L<Win32::Registry> object for manipulating the key in question.
 =cut
 
 sub GetRegKey {
+
     # Get the parameters.
     my ($class, $root, $path) = @_;
     # Insure we have access to the registry stuff.
     require Win32::Registry;
     # Get the root variable.
     my $rootKey;
-    if ($root eq 'HKLM') {
-        $rootKey = $::HKEY_LOCAL_MACHINE;
-    } elsif ($root eq 'HKCR') {
-        $rootKey = $::HKEY_CLASSES_ROOT;
-    } elsif ($root = 'HKCU') {
-        $rootKey = $::HKEY_CURRENT_USER;
+    {   # We temporarily turn off warnings in case we don't
+        # load the Win32 stuff, in which case the variables
+        # below are not declared.
+        no warnings 'once';
+        if ($root eq 'HKLM') {
+            $rootKey = $::HKEY_LOCAL_MACHINE;
+        } elsif ($root eq 'HKCR') {
+            $rootKey = $::HKEY_CLASSES_ROOT;
+        } elsif ($root = 'HKCU') {
+            $rootKey = $::HKEY_CURRENT_USER;
+        }
     }
     # Normalize the path. We convert slashes to backslashes and insure there is one at the end.
     $path =~ tr/\//\\/;
