@@ -17,6 +17,8 @@
 # http://www.theseed.org/LICENSE.TXT.
 #
 
+##TODO: can we fix the DocumentRoot problem?
+##TODO: add a test script that displays roles with EC numbers.
 
     use strict;
     use File::Basename;
