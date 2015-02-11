@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/env run_perl.sh
 
 #
 # Copyright (c) 2003-2006 University of Chicago and Fellowship
@@ -18,10 +18,8 @@
 #
 
 use strict;
-use lib 'lib';
-use Web_Config;
+use lib::Web_Config;
 use Tracer qw(:DEFAULT PrintLine);
-use lib "$FIG_Config::source/ERDB";
 use Shrub;
 use ERDBPDocPage;
 use ERDBExtras;

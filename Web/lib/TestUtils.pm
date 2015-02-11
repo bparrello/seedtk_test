@@ -2,7 +2,6 @@ package TestUtils;
 
     use strict;
     use CGI;
-    use Stats;
     use WebUtils;
 
 =head1 Test Utilities
@@ -194,7 +193,7 @@ Create a new, blank mapping of object reference strings to object names.
 
 This object needs to perform two functions. First, it tracks objects already
 found so we don't get into a recursion loop. Second, it uses a 
-L<Stats> object to track the number of objects of each type already found.
+hash to track the number of objects of each type already found.
 This is used to generate pretty names for each object.
 
 The parameters are both optional.
@@ -244,7 +243,7 @@ sub new {
     # Create and bless the object.
     my $retVal = { nameHash => {},
                    path => [],
-                   objectStats => Stats->new(qw(ARRAY HASH SCALAR)),
+                   objectStats => { ARRAY => 0, HASH => 0, SCALAR => 0 },
                    maxCols => $maxCols,
                    maxWidth => $maxWidth};
     bless $retVal, $class;
@@ -396,7 +395,8 @@ sub DisplayThing {
         } else {
             # Here it's new. We need to create a name for it.
             my $type = ref $value;
-            my $name = $type . $self->{objectStats}->Add($type);
+            my $idx = $self->{objectStats}{$type}++;
+            my $name = $type . $idx;
             $nameHash->{$value} = $name;
             # Output the object name as an anchored string. We attach a click event
             # to toggle the object value on and off.

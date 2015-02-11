@@ -1,15 +1,13 @@
-#!/usr/bin/perl
+#!/usr/bin/env run_perl.sh
 
     use strict;
     use lib 'lib';
-    use Web_Config;
     use CGI;
     use TestUtils;
     use WebUtils;
     use XML::Simple;
-    # Web_Config only includes the kernel library, and this script needs them all.
-    BEGIN { unshift @INC, @FIG_Config::libs; }
-    use Shrub;
+    use TestMethod;
+    use Shrub;		# This must go after "TestMethod" or it won't be found!
 
 print CGI::header();
 print CGI::start_html(-title => 'Test Page',
@@ -26,7 +24,7 @@ eval {
     } elsif ($struct eq 'Shrub Object') {
     	$retVal = Shrub->new();
     } elsif ($struct eq 'TEST') {
-    	$retVal = TestMethod();
+    	$retVal = TestMethod::TestMethod();
     } else {
     	die "Unknown structure requested."
     }
@@ -39,18 +37,5 @@ if ($@) {
     print CGI::blockquote($@);
 }
 print CGI::end_html();
-
-=head3 TestMethod
-
-Put code into this method to test simple PERL code. The value returned
-will be dumped.
-
-=cut
-
-sub TestMethod {
-	my @strings = qw(abcdefg 1234567);
-	my $retVal = [ map { substr($_, -3, 3) } @strings ];
-	return $retVal;
-}
 
 1;

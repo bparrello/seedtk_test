@@ -223,6 +223,7 @@ L</WriteAllConfigs> method.
 			copy $fig_config_name, "$base_dir/config/FIG_Config_old.pm";
 		}
 		# Write the FIG_Config.
+		print "Writing configuration to $outputName.\n";
 		WriteAllParams($outputName, $base_dir, $dataRootDir, $webRootDir, $opt);
 		# Execute it to get the latest variable values.
 		print "Reading back new configuration.\n";
@@ -238,7 +239,8 @@ L</WriteAllConfigs> method.
 	} else {
 		# Write the file.
 		print $oh "\n";
-		print $oh "    use lib '$sourcedir/config', '$sourcedir/kernel';\n";
+		print $oh "    use lib\n";
+		print $oh "        '" .	join("',\n        '", @FIG_Config::libs) . "';\n";
 		print $oh "\n";
 		print $oh "    use FIG_Config;\n";
 		print $oh "\n";
@@ -302,7 +304,13 @@ L</WriteAllConfigs> method.
 	}
 	# Check for the home directory symlink request.
 	if ($homeDir) {
-		symlink($FIG_Config::web_dir, "$homeDir/SEEDtk");
+		my $linkDir = "$homeDir/SEEDtk";
+		if (-d $linkDir) {
+			print "Symbolic link directory $linkDir already exists.\n";
+		} else {
+			symlink($FIG_Config::web_dir, "$homeDir/SEEDtk");
+			print "Symbolic link at $homeDir created for web hosting.\n";
+		}
 	}
 	# Finally, check for the links file.
 	if ($opt->links) {
@@ -318,7 +326,8 @@ L</WriteAllConfigs> method.
 			# Find the source copy of the file.
 			my $linksSrc = "$base_dir/utils/Links.html";
 			# Copy it to the destination.
-			copy $linksSrc, $linksDest;	
+			copy $linksSrc, $linksDest;
+			print "$linksDest file created.\n";
 		}
 	}
 	print "All done.\n";
