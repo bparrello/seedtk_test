@@ -1391,7 +1391,7 @@ sub GetAll {
 Output a list of values taken from the objects returned by a query. The
 output will be in the form of a tab-delimited sequential file. The first
 parameter is the output file handle; the remaining parameters correspond to those
-of the L<>/GetAll> method.
+of the L</GetAll> method.
 
 =over 4
 
@@ -2529,7 +2529,7 @@ If the first field is numeric, the method would return
 Name of the relation to be examined. This could be an entity name, a relationship
 name, or the name of a secondary entity relation.
 
-=item
+=item RETURN
 
 Returns the sort command to use for sorting the relation, suitable for piping.
 
