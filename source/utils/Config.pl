@@ -25,12 +25,6 @@
     use File::Path;
     use Getopt::Long::Descriptive;
 
-    # We don't have access to the normal SEEDtk libraries because
-    # we are still bootstrapping, so we have to pull in the
-    # kernel libraries explicitly.
-    use lib '../kernel';
-    use Env;
-
     # We need to look inside the FIG_Config even though it is loaded at
     # run-time, so we will get lots of warnings about one-time variables.
     no warnings qw(once);
@@ -124,6 +118,8 @@ L</WriteAllConfigs> method.
     $base_dir =~ tr/\\/\//;
     # Chop off the folder name to get the source root.
     $base_dir =~ s/\/\w+$//;
+    # Load in the "Env" module.
+    require "$base_dir/kernel/Env";
     # Determine the operating system.
     my $winMode = ($^O =~ /Win/ ? 1 : 0);
     # Analyze the command line.
