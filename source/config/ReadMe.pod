@@ -168,7 +168,7 @@ Now we need to get access to the correct version of PERL. To do this, you type
 
 We are now ready to bootstrap the system using the L<Config.pl> script. Type
 
-    perl source/utils/Config.pl --dirs --links --home=/homes/self/public_html Data Web --dna=/homes/parrello/DnaRepo
+    perl source/utils/Config.pl --dirs --links --dna=/homes/parrello/DnaRepo --home=/homes/self/public_html Data Web
 
 Here C<Data> should be your data directory, and C</homes/self/public_html> the path to a web-addressable
 directory, usually C<public_html> in your home directory.
