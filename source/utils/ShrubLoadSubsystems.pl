@@ -290,6 +290,7 @@ computed from information in the L<FIG_Config> file.
         }
     }
     # Finally, we link the subsystems to the genomes already in the database.
+    print "Checking for links.\n";
     if ($opt->links) {
         # This hash will contain the genomes found in the database.
         my %genomesLoaded = map { $_ => 1 } $shrub->GetFlat('Genome', "", [], 'id');
