@@ -23,7 +23,7 @@
         [b]Navy[/b] Chemistry group: includes reactions and compounds.
         [/list]
     </Notes>
-    <Diagram height="800" width="600" ratio="0.7" size="90"
+    <Diagram height="800" width="800" ratio="0.7" size="90"
         fontSize="12" editable="0" />
     <Entities>
         <Entity name="Genome" keyType="string">
