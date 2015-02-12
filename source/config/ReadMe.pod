@@ -53,13 +53,9 @@ new environment.
 
 =head2 The Data Directory
 
-Inside the data directory there are three main folders.
+Inside the data directory there are two main folders.
 
 =over 4
-
-=item DnaRepo
-
-The repository for DNA sequences, generally in the form of contig FASTA files.
 
 =item Inputs
 
@@ -123,18 +119,28 @@ Display the configuration variables and their values.
 
 =back
 
+=head2 The DNA Repository
+
+Each database has a DNA Repository containing the DNA sequences for each genome. If you are
+developing using a local database, then this should point to a local directory (usually
+C<DnaRepo> in the data directory). If you are using a shared database, B<you must use the
+repository belonging to that database>. The location of the DNA Repository is specified
+in your L<FIG_Config> file, which is also where you specify the location of the database.
+Both of these things can be overridden onthe command line when you invoke a database
+application.
+
 =head1 Setting up a Unix Environment
 
-In the examples below, it will be assumed your user name is C<self>. Simply substitute your real username 
+In the examples below, it will be assumed your user name is C<self>. Simply substitute your real username
 when typing the commands.
 
 First, you need a user name and password on GITHUB, and it must be an authorized contributor to the C<seedtk_test>
 repository. To insure that you are appropriately identtified, tell GIT your name and EMAIL.
 
-	git config user.name yourFullName
-	git config user.email yourGitHubEmail 
+    git config user.name yourFullName
+    git config user.email yourGitHubEmail
 
-Position in your home directory with the B<bash> shell active. 
+Position in your home directory with the B<bash> shell active.
 
 Clone the repository using GIT.
 
@@ -162,7 +168,7 @@ Now we need to get access to the correct version of PERL. To do this, you type
 
 We are now ready to bootstrap the system using the L<Config.pl> script. Type
 
-    perl source/utils/Config.pl --dirs --links --home=/homes/self/public_html Data Web
+    perl source/utils/Config.pl --dirs --links --home=/homes/self/public_html Data Web --dna=/homes/parrello/DnaRepo
 
 Here C<Data> should be your data directory, and C</homes/self/public_html> the path to a web-addressable
 directory, usually C<public_html> in your home directory.
@@ -194,4 +200,61 @@ made to the system as a whole.
 
 =head1 Using Git
 
+On this project, you will at all times be dealing with two source control repositories. One of them
+is the local repository on your hard disk. You will be making commits to this repository frequently,
+a process that gives you a useful backup and history of your work. There is also the GITHUB repository
+in the cloud. This is shared by everyone on the project. You will be making commits to this more
+rarely.
 
+Before you do anything, your local repository should be in a committed state. To check the state, use
+
+    git status -v
+
+which will tell you what has changed since your last commit. To commit your changes, use
+
+    git commit -a -m "commit message"
+
+where C<commit message> is a brief description of your changes. YOU MUST NEVER FORGET TO ADD THE
+MESSAGE. If you do, you will be forced to use the VI editor as punishment.
+
+Once your repository is in a committed state, you can get the latest changes from the shared
+repository using
+
+    git pull
+
+Sometimes this may reveal merge conflicts. This will require editing the file to resolve the conflicts,
+after which you must re-add the file to the index
+
+    git add path/to/file
+
+and then commit again.
+
+To push your changes to the repository, use
+
+    git push
+
+Sometimes you will get a C<Forbidden> error. The most common causes of this error are
+
+over =4
+
+=item 1
+
+The shared repository has changed recently and you have to do B<pull> first.
+
+=item 2
+
+You have uncommitted changes in your local repository.
+
+=item 3
+
+You typed the wrong password. Note there is a way to use SSH keys to bypass the need for passwords,
+but these are not set up yet. We're working on it.
+
+=back
+
+There are numerous other features and capabilities in GIT; however, these will get you through almost all
+of the tasks you need to do.
+
+=cut
+
+1;
