@@ -192,4 +192,6 @@ directly and everything will be fixed up automatically. You will not need to do 
 change the code, only when you add a new script, update L<FIG_Config>, or an environment change is
 made to the system as a whole.
 
+=head1 Using Git
+
 

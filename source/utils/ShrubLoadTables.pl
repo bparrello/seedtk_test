@@ -53,13 +53,16 @@ specified in the positional parameters.
     use Shrub;
     use ShrubLoader;
 
+    $| = 1; # Prevent buffering on STDOUT.
     # Connect to the database.
+    print "Connecting to database.\n";
     my ($shrub, $opt) = Shrub->new_for_script('%c %o table1 table2 ...', {},
             ["objects=s", "file containing table list in first column"],
             );
     # Create a loader helper and get the statistics object.
     my $loader = ShrubLoader->new($shrub);
     my $stats = $loader->stats;
+    print "Parsing parameters.\n";
     # Get the list of objects on the command line.
     my @objects = @ARGV;
     # Check for a list file.
@@ -72,6 +75,7 @@ specified in the positional parameters.
         die "Nothing to load: no parameters and no --objects option.";
     }
     # Now loop through the objects forming a list of table names.
+    print "Analyzing tables.\n";
     my @rels;
     for my $object (@objects) {
         $stats->Add(open_objects => 1);

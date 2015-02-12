@@ -436,14 +436,14 @@ sub WriteAllParams {
             shrub_dir => "$dataRootDir");
     Env::WriteParam($oh, 'full name of the Shrub DBD XML file', shrub_dbd => "$base_dir/ERDB/ShrubDBD.xml");
     Env::WriteParam($oh, 'Shrub database signon info (name/password)', userData => "seed/");
-    Env::WriteParam($oh, 'name of the Shrub database', shrubDB => "seedtk_shrub");
+    Env::WriteParam($oh, 'name of the Shrub database (empty string to use the default)', shrubDB => "");
     Env::WriteParam($oh, 'TRUE if we should create indexes before a table load (generally TRUE for MySQL, FALSE for PostGres)',
             preIndex => 1);
     Env::WriteParam($oh, 'default DBMS (currently only "mysql" works for sure)', dbms => "mysql");
     Env::WriteParam($oh, 'database access port', dbport => 3306);
     Env::WriteParam($oh, 'TRUE if we are using an old version of MySQL (legacy parameter; may go away)', mysql_v3 => 0);
     Env::WriteParam($oh, 'default MySQL storage engine', default_mysql_engine => "InnoDB");
-    Env::WriteParam($oh, 'default database host server', dbhost => "seed-db-write.mcs.anl.gov");
+    Env::WriteParam($oh, 'database host server (empty string to use the default)', dbhost => "");
     Env::WriteParam($oh, 'TRUE to turn off size estimates during table creation-- should be FALSE for MyISAM',
             disable_dbkernel_size_estimates => 1);
     Env::WriteParam($oh, 'mode for LOAD TABLE INFILE statements, empty string is OK except in special cases (legacy parameter; may go away)',
