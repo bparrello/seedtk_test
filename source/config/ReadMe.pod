@@ -125,11 +125,16 @@ Display the configuration variables and their values.
 
 =head1 Setting up a Unix Environment
 
-First, you need a user name and password on GITHUB, and it must be an authorized contributor to the C<seedtk_test>
-repository.
+In the examples below, it will be assumed your user name is C<self>. Simply substitute your real username 
+when typing the commands.
 
-Position in your home directory with the B<bash> shell active. In the examples below, it will be assumed your user
-name is C<self>. Simply substitute your real username when typing the commands.
+First, you need a user name and password on GITHUB, and it must be an authorized contributor to the C<seedtk_test>
+repository. To insure that you are appropriately identtified, tell GIT your name and EMAIL.
+
+	git config user.name yourFullName
+	git config user.email yourGitHubEmail 
+
+Position in your home directory with the B<bash> shell active. 
 
 Clone the repository using GIT.
 
