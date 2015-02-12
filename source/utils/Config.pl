@@ -99,6 +99,11 @@ SEEDtk web to be accessed from it. Only Unix systems should use this feature.
 If C<1>, the system requires a PERL path fixup. The contents of C<PerlPath.sh> will be added
 to the B<UConfig> file. This defaults to C<1> for Unix and C<0> for Windows.
 
+=item dna
+
+If specified, the location for the DNA repository. If you are using a shared database, then
+this insures you are using the same repository as everyone else.
+
 =back
 
 =head2 Notes for Programmers
@@ -136,6 +141,7 @@ L</WriteAllConfigs> method.
             ["apache=s", "location of the Apache configuration files for the testing server"],
             ["dirs", "verify default subdirectories exist"],
             ["pfix=i", "perform PERL path fixup", { default => (1 - $winMode) }],
+            ["dna=s", "location of the DNA repository (if other than local)"],
             ["home=s", "location of the home web directory for the current user; if specified, a link will be placed to the web directory"],
             ["links", "generate Links.html file"],
             );
@@ -187,7 +193,12 @@ L</WriteAllConfigs> method.
         # Are we setting up default data directories?
         if ($opt->dirs) {
             # Yes. Insure we have the data paths.
-            BuildPaths($opt->winmode, Data => $dataRootDir, qw(Inputs Inputs/GenomeData Inputs/SubSystemData DnaRepo LoadFiles));
+            BuildPaths($opt->winmode, Data => $dataRootDir, qw(Inputs Inputs/GenomeData Inputs/SubSystemData LoadFiles));
+            # Are we using a local DNA repository?
+            if (! $opt->dna) {
+                # Yes. Build that, too.
+                BuildPaths($opt->winmode, Data => $dataRootDir, qw(DnaRepo));
+            }
         }
     }
     # Make sure we have the web directory if there is no web root in
@@ -432,7 +443,7 @@ sub WriteAllParams {
             'our @libs = map { "$source/$_" } (qw(' . join(" ", LIBS) . '), @plibs);');
     # Now comes the Shrub configuration section.
     Env::WriteLines($oh, "", "", "# SHRUB CONFIGURATION", "");
-    Env::WriteParam($oh, 'root directory for Shrub data files (should have subdirectories "Inputs" (optional), "DnaRepo" (required) and "LoadFiles" (required))',
+    Env::WriteParam($oh, 'root directory for Shrub data files (should have subdirectories "Inputs" (optional) and "LoadFiles" (required))',
             shrub_dir => "$dataRootDir");
     Env::WriteParam($oh, 'full name of the Shrub DBD XML file', shrub_dbd => "$base_dir/ERDB/ShrubDBD.xml");
     Env::WriteParam($oh, 'Shrub database signon info (name/password)', userData => "seed/");
@@ -448,6 +459,13 @@ sub WriteAllParams {
             disable_dbkernel_size_estimates => 1);
     Env::WriteParam($oh, 'mode for LOAD TABLE INFILE statements, empty string is OK except in special cases (legacy parameter; may go away)',
             load_mode => '');
+    # Now comes the DNA repository. There are two cases-- a local repository or a global one. Check the type.
+    my $dnaRepo = $opt->dna;
+    if (! $dnaRepo) {
+        # Here we have the local repository.
+        $dnaRepo = "$dataRootDir/DnaRepo";
+    }
+    Env::WriteParam($oh, 'location of the DNA repository', shrub_dna => $dnaRepo);
     ## Put new Shrub parameters here.
     # Write the trailer.
     print $oh "\n1;\n";

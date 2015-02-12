@@ -136,7 +136,7 @@ sub new {
     my $dbName = $options{dbName} || $FIG_Config::shrubDB || "seedtk_shrub";
     my $userData = $options{userData} || $FIG_Config::userData || "seed/";
     my $dbhost = $options{dbhost} || $FIG_Config::dbhost || "seed-db-write.mcs.anl.gov";
-    my $repository = $options{repository} || "$dirBase/DnaRepo";
+    my $repository = $options{repository} || "$FIG_Config::shrub_dna";
     my $port = $options{port} || $FIG_Config::dbport || 3306;
     my $dbms = $options{dbms} || 'mysql';
     # Insure that if the user specified a DBD, it overrides the internal one.
