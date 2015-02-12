@@ -288,31 +288,31 @@ computed from information in the L<FIG_Config> file.
                         translateLinks => 0, priv => $priv);
             }
         }
-        # Finally, we link the subsystems to the genomes already in the database.
-        if ($opt->links) {
-            # This hash will contain the genomes found in the database.
-            my %genomesLoaded = map { $_ => 1 } $shrub->GetFlat('Genome', "", [], 'id');
-            print scalar(keys %genomesLoaded) . " genomes already loaded in database.\n";
-            # Loop through the subsystems.
-            for my $sub (sort keys %subDirs) {
-                # Get this subsystem's directory.
-                my $subDir = $subDirs{$sub};
-                print "Connecting genomes for $sub.\n";
-                # Open the genome connection file.
-                my $ih = $loader->OpenFile("$subDir/GenomesInSubsys", 'genome');
-                # Loop through the genomes.
-                while (my $gData = $loader->GetLine($ih, 'genome')) {
-                    my ($genome, undef, $varCode) = @$gData;
-                    # Is this genome in the database?
-                    if ($genomesLoaded{$genome}) {
-                        # Yes, connect it.
-                        $loader->InsertObject('Subsystem2Genome', 'from-link' => $sub, 'to-link' => $genome,
-                                variant => $varCode);
-                        $stats->Add(genomeConnected => 1);
-                    } else {
-                        # No, skip it.
-                        $stats->Add(genomeSkipped => 1);
-                    }
+    }
+    # Finally, we link the subsystems to the genomes already in the database.
+    if ($opt->links) {
+        # This hash will contain the genomes found in the database.
+        my %genomesLoaded = map { $_ => 1 } $shrub->GetFlat('Genome', "", [], 'id');
+        print scalar(keys %genomesLoaded) . " genomes already loaded in database.\n";
+        # Loop through the subsystems.
+        for my $sub (sort keys %subDirs) {
+            # Get this subsystem's directory.
+            my $subDir = $subDirs{$sub};
+            print "Connecting genomes for $sub.\n";
+            # Open the genome connection file.
+            my $ih = $loader->OpenFile("$subDir/GenomesInSubsys", 'genome');
+            # Loop through the genomes.
+            while (my $gData = $loader->GetLine($ih, 'genome')) {
+                my ($genome, undef, $varCode) = @$gData;
+                # Is this genome in the database?
+                if ($genomesLoaded{$genome}) {
+                    # Yes, connect it.
+                    $loader->InsertObject('Subsystem2Genome', 'from-link' => $sub, 'to-link' => $genome,
+                            variant => $varCode);
+                    $stats->Add(genomeConnected => 1);
+                } else {
+                    # No, skip it.
+                    $stats->Add(genomeSkipped => 1);
                 }
             }
         }
